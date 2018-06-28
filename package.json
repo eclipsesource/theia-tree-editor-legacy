@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "scripts": {
+    "prepare": "lerna run prepare"
+  },
+  "devDependencies": {
+    "lerna": "2.4.0"
+  },
+  "workspaces": [
+    "theia-tree-editor-extension"
+  ]
+}
