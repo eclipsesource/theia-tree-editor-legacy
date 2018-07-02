@@ -4,6 +4,10 @@ The Theia Tree Editor showcases the integration of [JSON Forms](https://github.c
 
 ## Getting started
 
+> Open your terminal and switch to a new directory
+
+    git clone git@github.com:eclipsesource/theia-tree-editor.git
+    cd theia-tree-editor
     yarn install
     yarn prepare
     cd theia-tree-editor-extension
@@ -14,6 +18,7 @@ The Theia Tree Editor showcases the integration of [JSON Forms](https://github.c
 # How To Create A Sample Editor Application with Theia Tree Editor Extension
 
 > TreeEditorOpenHandler shouldn't be used as stand-alone extension.
+In this example, we are going to create a custom editor extension for task editing with the tree editor extension
 
 
 ## Prerequisites
@@ -27,28 +32,28 @@ The Theia Tree Editor showcases the integration of [JSON Forms](https://github.c
 
     npm install -g yarn
 
-> Also make sure your python --version points to a Python 2.x installation.
+> Also make sure your python --version points to a Python 2.x installation. Run the following command in your terminal.
+
+    python --version
 
 ## Project Layout
 
-> Use the theia extension generator for project scaffolding
+> Open a new terminal, switch to a new directory and clone the github repo. Create a tarball from theia-tree-editor-extension
 
-    npm install -g yo generator-theia-extension
-    mkdir task-editor
-    cd task-editor
-    yo theia-extension task-editor
-
-> Open a new terminal and clone the github repo. Create a tarball from theia-tree-editor-extension
-
-    git clone git@github.com:eclipsesource/coffee-editor.git
+    git clone git@github.com:eclipsesource/theia-tree-editor.git
     cd theia-tree-editor
     yarn install
     yarn prepare
     cd theia-tree-editor-extension
     npm pack
 
-> Go back to your task-editor directory
+> After creating theia-tree-editor-extension tarball,
+open a new terminal, switch to a new directory and install generator-theia-extension. Use the theia extension generator for project scaffolding
 
+    npm install -g yo generator-theia-extension
+    mkdir task-editor
+    cd task-editor
+    yo theia-extension task-editor
     cd task-editor-extension
 
 > Move the generated tarball to the task-editor-extension working directory and install dependencies.
@@ -125,33 +130,29 @@ The Theia Tree Editor showcases the integration of [JSON Forms](https://github.c
 
 **config.ts:**
 ```js
-import { taskView, userGroupView, userView } from './uischemata';
+import { taskView, taskGroupView } from './uischemata';
 
 export const labelProvider = {
-  '#user': 'name',
-  '#userGroup': 'label',
+  '#taskGroup': 'label',
   '#task': 'name',
 };
 
 export const imageProvider = {
   '#task': 'task',
-  '#user': 'user',
-  '#userGroup': 'userGroup'
+  '#taskGroup': 'taskGroup'
 };
 
 export const modelMapping = {
   'attribute': '_type',
   'mapping': {
     'task': '#task',
-    'user': '#user',
-    'userGroup': '#userGroup'
+    'taskGroup': '#taskGroup'
   }
 };
 
 export const detailSchemata = {
   '#task': taskView,
-  '#user': userView,
-  '#userGroup': userGroupView,
+  '#taskGroup': taskGroupView,
 };
 ```
 **schema.ts:**
@@ -159,19 +160,19 @@ export const detailSchemata = {
 export const taskSchema = {
   '$schema': 'http://json-schema.org/draft-07/schema',
   'type': 'object',
-  '$id': '#userGroup',
+  'id': '#taskGroup',
   'properties': {
     '_type': {
       'type': 'string',
-      'default': 'userGroup'
+      'default': 'taskGroup'
     },
     'label': {
       'type': 'string'
     },
-    'users': {
+    'tasks': {
       'type': 'array',
       'items': {
-        '$ref': '#/definitions/user'
+        '$ref': '#/definitions/task'
       }
     }
   },
@@ -179,7 +180,7 @@ export const taskSchema = {
   'definitions': {
     'task': {
       'type': 'object',
-      '$id': '#task',
+      'id': '#task',
       'properties': {
         '_type': {
           'type': 'string',
@@ -187,18 +188,6 @@ export const taskSchema = {
         },
         'name': {
           'type': 'string'
-        },
-        'dueDate': {
-          'type': 'string',
-          'format': 'date'
-        },
-        'done': {
-          'type': 'boolean'
-        },
-        'priority': {
-          'type': 'string',
-          'enum': ['High', 'Medium', 'Low'],
-          'default': 'Medium'
         },
         'subTasks': {
           'type': 'array',
@@ -209,60 +198,13 @@ export const taskSchema = {
       },
       'required': [ 'name', 'priority' ],
       'additionalProperties': false
-    },
-    'user': {
-      'type': 'object',
-      '$id': '#user',
-      'properties': {
-        '_type': {
-          'type': 'string',
-          'default': 'user'
-        },
-        'name': {
-          'type': 'string'
-        },
-        'birthday': {
-          'type': 'string',
-          'format': 'date'
-        },
-        'nationality': {
-          'type': 'string',
-          'enum': ['DE', 'IT', 'JP', 'US', 'RU', 'Other']
-        },
-        'tasks': {
-          'type': 'array',
-          'items': {
-            '$ref': '#/definitions/task'
-          }
-        }
-      },
-      'required': [ 'name' ],
-      'additionalProperties': false
     }
   }
 };
 ```
 **uischemata.ts:**
 ```js
-export const userView = {
-  'type': 'VerticalLayout',
-  'elements': [
-    {
-      'type': 'Control',
-      'scope': '#/properties/name'
-    },
-    {
-      'type': 'Control',
-      'scope': '#/properties/birthday'
-    },
-    {
-      'type': 'Control',
-      'scope': '#/properties/nationality'
-    }
-  ]
-};
-
-export const userGroupView = {
+export const taskGroupView = {
   'type': 'VerticalLayout',
   'elements': [
     {
@@ -278,23 +220,6 @@ export const taskView = {
     {
       'type': 'Control',
       'scope': '#/properties/name'
-    },
-    {
-      'type': 'HorizontalLayout',
-      'elements': [
-        {
-          'type': 'Control',
-          'scope': '#/properties/done'
-        },
-        {
-          'type': 'Control',
-          'scope': '#/properties/dueDate'
-        }
-      ]
-    },
-    {
-      'type': 'Control',
-      'scope': '#/properties/priority'
     }
   ]
 };
@@ -493,20 +418,20 @@ const initStore = async() => {
     }
   );
 
-  const schema = await JsonRefs.resolveRefs(taskSchema)
+  return await JsonRefs.resolveRefs(taskSchema)
     .then(
-      resolvedSchema => resolvedSchema.resolved,
+      resolvedSchema => {
+        store.dispatch(Actions.init({}, resolvedSchema.resolved, uischema));
+
+        store.dispatch(setContainerProperties(
+          findAllContainerProperties(resolvedSchema.resolved, resolvedSchema.resolved)));
+
+        return store;
+      },
       err => {
         console.log(err.stack);
         return {};
       });
-
-  store.dispatch(Actions.init({}, schema, uischema));
-
-  store.dispatch(setContainerProperties(
-    findAllContainerProperties(schema, schema)));
-
-  return store;
 };
 
 const TaskApp = defaultProps(
@@ -535,220 +460,7 @@ export class TaskEditor extends TreeEditorOpenHandler {
 
 > To use stylesheets in your application, create a folder and name it `style` for our example. Create the following files.
 
-**jsoneditor.css:**
-
-```js
-:root {
-    --jsf-modest-bg-color: #217daf;
-    --jsf-border-color: lightgray;
-    --jsf-validation-color: #F44336;
-}
-
-.tree-class {
-    overflow-y: scroll;
-}
-
-.array-button {
-    margin-right: 0.5em
-}
-
-.group.label {
-    color: lightgray;
-}
-
-.validation_error  {
-    color: var(--jsf-validation-color);
-}
-
-fieldset {
-    margin-bottom: 0.5em;
-}
-
-fieldset legend label {
-    font-size: 1em;
-}
-
-jsf-treeMasterDetail {
-    display: flex;
-    flex-direction: column;
-}
-.jsf-treeMasterDetail > .jsf-treeMasterDetail-content {
-    display: flex;
-    flex-direction: row;
-}
-.jsf-treeMasterDetail > .jsf-treeMasterDetail-content > * {
-    padding: 0.5em;
-    border-style: solid;
-    border-width: thin;
-    border-color: var(--jsf-border-color);
-    border-radius: 0.2em;
-}
-.jsf-treeMasterDetail > .jsf-treeMasterDetail-content > *:first-child {
-    margin-right: 0.25em;
-}
-.jsf-treeMasterDetail-master {
-    flex:1;
-}
-.jsf-treeMasterDetail-detail {
-    flex:3;
-}
-.jsf-treeMasterDetail-master ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    position: relative;
-    overflow:hidden;
-}
-.jsf-treeMasterDetail-master li {
-    min-height: 1em;
-    position: relative;
-    padding-left: 1.5em;
-}
-.jsf-treeMasterDetail-master li > div {
-    display: flex;
-    flex-direction: row;
-}
-.jsf-treeMasterDetail-master li > div > .icon {
-    flex-basis: 1em;
-    min-height: 1em;
-    margin-right: 0.25em;
-    background-repeat: no-repeat;
-    background-position: center;
-}
-
-.jsf-treeMasterDetail-master li.selected > div > .label {
-    font-weight: bold;
-}
-.jsf-treeMasterDetail-master li > div > .label {
-    display: flex;
-    flex: 1;
-    margin-right: 1em;
-    min-height: 1.5em;
-    color: white;
-    align-items: center;
-}
-
-.jsf-treeMasterDetail-master li > div > .label > span:first-child:empty {
-    background: #ffff00;
-    max-height: 1.5em;
-}
-.jsf-treeMasterDetail-master li > div > .label:hover {
-    font-weight: bold;
-    cursor: pointer;
-    color: white;
-    opacity: 0.9;
-    background-color: var(--jsf-modest-bg-color);
-}
-.jsf-treeMasterDetail-master li > div > .label > .add,
-.jsf-treeMasterDetail-master li > div > .label > .remove {
-    display: none;
-    cursor: pointer;
-    margin-left: 0.25em;
-    font-weight: normal;
-    width: inherit;
-    height: inherit;
-    min-width: unset;
-}
-.jsf-treeMasterDetail-master li > div > .label:hover > .add,
-.jsf-treeMasterDetail-master li > div > .label:hover > .remove {
-    display: flex;
-    justify-content: center;
-}
-.jsf-treeMasterDetail-master li > div > .label:hover > .add:hover,
-.jsf-treeMasterDetail-master li > div > .label:hover > .remove:hover {
-    color: white;
-    border-radius: 50%;
-}
-.jsf-treeMasterDetail-master li::before,
-.jsf-treeMasterDetail-master li::after,
-.jsf-treeMasterDetail-master ul::after {
-    content: '';
-    position: absolute;
-    left:0.2em;
-}
-.jsf-treeMasterDetail-master li::before {
-    border-top: 1px solid var(--jsf-border-color);
-    top:0.5em;
-    width: 1em;
-}
-.jsf-treeMasterDetail-master li::after {
-    border-left: 1px solid var(--jsf-border-color);
-    height:100%;
-    top:-0.6em;
-}
-.jsf-treeMasterDetail-master ul::after {
-    border-left: 1px solid var(--jsf-border-color);
-    height: 0.6em;
-    bottom: 0;
-}
-.jsf-treeMasterDetail-master ul:last-child::after {
-    display: none;
-}
-.jsf-treeMasterDetail-master > ul > li::after {
-    top:0.5em;
-}
-.jsf-treeMasterDetail-master > ul > li:last-child::after {
-    display: none;
-}
-.jsf-treeMasterDetail-master > ul > li:only-child::before {
-    display: none;
-}
-.jsf-treeMasterDetail-master > ul > li:only-child {
-    padding-left: 0.25em;
-}
-
-/* tree master detail create dialog */
-.jsf-treeMasterDetail-dialog {
-    border-width: medium;
-    border-radius: 8px;
-    border-color: lightgrey
-}
-.jsf-treeMasterDetail-dialog-title {
-    font-size: large;
-}
-.jsf-treeMasterDetail-dialog-content {
-    display: flex;
-    flex-direction: column;
-}
-.jsf-treeMasterDetail-dialog-button,
-.jsf-treeMasterDetail-dialog-createbutton {
-    margin-bottom: 5px
-}
-.jsf-treeMasterDetail-dialog-button {
-    width: 100%;
-    margin-top: 10px;
-    margin-bottom: 0;
-}
-
-.jsf-treeMasterDetail-dialog-close {
-    width: 100%;
-    margin-top: 20px;
-}
-
-/* Drag and Drop */
-/* Create border for possible drag and drop drop-zones */
-
-.jsf-editor-dnd-target-valid,
-.jsf-editor-dnd-target-invalid {
-    border-style: dashed;
-    border-width: thin;
-}
-
-.jsf-editor-dnd-target-valid {
-    border-color: rgb(88, 199, 23);
-    min-height: 1em;
-}
-
-.jsf-editor-dnd-target-invalid {
-    border-color: rgb(189, 0, 0);
-}
-
-.jsf-editor-dnd-current-target {
-    border-width:  medium;
-}
-```
-
-> You can set the png files that you want to use. Create `icons` folder in `style` folder and add your files there
+> For `ImageProvier` you need to provide icons (optional). Create `icons` folder in `style` folder and add your files there
 
 **example.css:**
 
@@ -756,11 +468,8 @@ jsf-treeMasterDetail {
 .icon {
     background-repeat: no-repeat;
 }
-.icon.user {
-    background-image: url('./icons/User.png');
-}
-.icon.userGroup {
-    background-image: url('./icons/UserGroup.png');
+.icon.taskGroup {
+    background-image: url('./icons/TaskGroup.png');
 }
 .icon.task {
     background-image: url('./icons/Task.png');
@@ -770,7 +479,6 @@ jsf-treeMasterDetail {
 **index.css:**
 
 ```js
-@import './jsoneditor.css';
 @import './example.css';
 
 ```
