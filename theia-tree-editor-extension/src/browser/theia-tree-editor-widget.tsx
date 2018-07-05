@@ -1,19 +1,21 @@
 import { Widget } from "@phosphor/widgets";
-import { Message } from '@theia/core/lib/browser';
+import { Message, Saveable, SaveableSource } from '@theia/core/lib/browser';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { getData } from '@jsonforms/core';
+import { TreeEditorSaveable } from './TreeEditorSaveable';
 
 let num = 0;
-export class TreeEditorWidget extends Widget {
+export class TreeEditorWidget extends Widget implements SaveableSource {
   private store;
+  saveable: Saveable;
   constructor(store, EditorComponent, private saveData: (data: object) => void) {
     super();
     num++;
     this.id = `react-app-${num}`;
     this.addClass('tree-class');
     this.store = store;
+    this.saveable = new TreeEditorSaveable(this.saveData, this.store);
 
     ReactDOM.render(
       <Provider store={store}>
@@ -33,7 +35,6 @@ export class TreeEditorWidget extends Widget {
   }
 
   close() {
-    this.saveData(getData(this.store.getState()));
     super.close();
   }
 }
