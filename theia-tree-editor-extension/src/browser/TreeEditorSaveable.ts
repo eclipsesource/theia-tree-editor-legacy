@@ -26,5 +26,6 @@ export class TreeEditorSaveable implements Saveable {
 
   save(): MaybePromise<void> {
     this.saveData(getData(this.store.getState()));
+    this.dirty = false;
   }
 };

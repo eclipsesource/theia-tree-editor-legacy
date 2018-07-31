@@ -19,7 +19,7 @@ export class TreeEditorWidget extends Widget implements SaveableSource {
 
     ReactDOM.render(
       <Provider store={store}>
-        <EditorComponent />
+        <EditorComponent saveable={this.saveable}/>
       </Provider>,
       this.node);
   }
