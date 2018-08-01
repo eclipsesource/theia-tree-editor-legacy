@@ -1,5 +1,6 @@
 import { Widget } from "@phosphor/widgets";
 import { Message, Saveable, SaveableSource } from '@theia/core/lib/browser';
+import { Resource } from '@theia/core/lib/common';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
@@ -7,15 +8,13 @@ import { TreeEditorSaveable } from './TreeEditorSaveable';
 
 let num = 0;
 export class TreeEditorWidget extends Widget implements SaveableSource {
-  private store;
   saveable: Saveable;
-  constructor(store, EditorComponent, private saveData: (data: object) => void) {
+  constructor(private store, EditorComponent, private resource: Resource) {
     super();
     num++;
     this.id = `react-app-${num}`;
     this.addClass('tree-class');
-    this.store = store;
-    this.saveable = new TreeEditorSaveable(this.saveData, this.store);
+    this.saveable = new TreeEditorSaveable(this.resource, this.store);
 
     ReactDOM.render(
       <Provider store={store}>

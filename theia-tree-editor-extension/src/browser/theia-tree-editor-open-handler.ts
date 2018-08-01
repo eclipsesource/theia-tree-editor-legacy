@@ -2,8 +2,7 @@ import { FrontendApplication, OpenHandler, OpenerOptions } from '@theia/core/lib
 import {
   MaybePromise,
   SelectionService,
-  ResourceProvider,
-  Resource
+  ResourceProvider
 } from '@theia/core/lib/common';
 import URI from '@theia/core/lib/common/uri';
 import { TreeEditorWidget } from './theia-tree-editor-widget';
@@ -55,7 +54,7 @@ export class TreeEditorOpenHandler implements OpenHandler {
           initializedStore.dispatch(Actions.update('', () => parsedContent));
           const treeEditor = new TreeEditorWidget(initializedStore,
                                                   this.EditorComponent,
-                                                  this.saveData(resource));
+                                                  resource);
           treeEditor.title.caption = uri.path.base;
           treeEditor.title.label = uri.path.base;
           treeEditor.title.closable = true;
@@ -65,14 +64,5 @@ export class TreeEditorOpenHandler implements OpenHandler {
         });
       });
     });
-  }
-
-  // Saves the data into resource's content.
-  private saveData = (resource: Resource) => (data: Object): void => {
-    if ( resource.saveContents !== undefined ) {
-      resource.saveContents(JSON.stringify(data, null, 2), { encoding: 'UTF-8' });
-    } else {
-      console.warn('resource cannot save');
-    }
   }
 }
