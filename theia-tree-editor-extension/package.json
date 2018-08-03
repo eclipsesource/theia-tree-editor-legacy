@@ -29,7 +29,12 @@
     "prepare": "yarn run clean && yarn run build",
     "clean": "rimraf lib",
     "build": "tsc",
-    "watch": "tsc -w"
+    "watch": "tsc -w",
+    "major": "npm version major",
+    "minor": "npm version minor",
+    "patch": "npm version patch",
+    "tag": "PACKAGE_VERSION=$(echo $npm_package_version) && git tag v$PACKAGE_VERSION && git push origin v$PACKAGE_VERSION",
+    "version": "echo $npm_package_version"
   },
   "theiaExtensions": []
 }
