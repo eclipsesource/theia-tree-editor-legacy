@@ -27,5 +27,11 @@
     "exclude": [
         "node_modules",
         "lib"
+    ],
+    "include": [
+        "src"
+    ],
+    "files": [
+        "./src/browser/index.ts"
     ]
 }
