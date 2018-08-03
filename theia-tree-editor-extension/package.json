@@ -1,5 +1,8 @@
 {
   "name": "theia-tree-editor-extension",
+  "description": "Theia Tree Editor Extension",
+  "main": "lib/browser/index.js",
+  "typings": "lib/browser/index.d.ts",
   "keywords": [
     "theia-extension"
   ],
