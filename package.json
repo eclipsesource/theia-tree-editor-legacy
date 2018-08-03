@@ -4,7 +4,12 @@
   "name": "theia-tree-editor",
   "description": "Theia Tree Editor",
   "scripts": {
-    "prepare": "lerna run prepare"
+    "prepare": "lerna run prepare",
+    "major": "npm version major",
+    "minor": "npm version minor",
+    "patch": "npm version patch",
+    "tag": "PACKAGE_VERSION=$(echo $npm_package_version) && sed -i '' '/lib/d' .gitignore && git add .gitignore && git commit -m $PACKAGE_VERSION && git tag v$PACKAGE_VERSION && git push origin v$PACKAGE_VERSION",
+    "version": "echo $npm_package_version"
   },
   "devDependencies": {
     "lerna": "2.4.0"

@@ -24,9 +24,8 @@
         "outDir": "lib",
         "keyofStringsOnly": true
     },
-    "exclude": [
-        "node_modules",
-        "lib"
+    "exclude":[
+        "node_modules"
     ],
     "include": [
         "src"
