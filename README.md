@@ -10,8 +10,6 @@ The Theia Tree Editor showcases the integration of [JSON Forms](https://github.c
     cd theia-tree-editor
     yarn install
     yarn prepare
-    cd theia-tree-editor-extension
-    npm pack
 
 > Use the generated module in your Theia application
 
@@ -38,17 +36,7 @@ In this example, we are going to create a custom editor extension for task editi
 
 ## Project Layout
 
-> Open a new terminal, switch to a new directory and clone the github repo. Create a tarball from theia-tree-editor-extension
-
-    git clone git@github.com:eclipsesource/theia-tree-editor.git
-    cd theia-tree-editor
-    yarn install
-    yarn prepare
-    cd theia-tree-editor-extension
-    npm pack
-
-> After creating theia-tree-editor-extension tarball,
-open a new terminal, switch to a new directory and install generator-theia-extension. Use the theia extension generator for project scaffolding
+> Open a new terminal, switch to a new directory and install generator-theia-extension. Use the theia extension generator for project scaffolding
 
     npm install -g yo generator-theia-extension
     mkdir task-editor
@@ -56,16 +44,16 @@ open a new terminal, switch to a new directory and install generator-theia-exten
     yo theia-extension task-editor
     cd task-editor-extension
 
-> Move the generated tarball to the task-editor-extension working directory and install dependencies.
+> Install dependencies.
 
 **Add the following dependencies in the package.json of the task-editor-extension**
 
 ```js
 
   "dependencies": {
-    "@jsonforms/core": "^2.0.2",
-    "@jsonforms/editor": "^2.0.2",
-    "@jsonforms/material-renderers": "^2.0.2",
+    "@jsonforms/core": "^2.0.6",
+    "@jsonforms/editor": "^2.0.6",
+    "@jsonforms/material-renderers": "^2.0.6",
     "@material-ui/core": "^1.2.1",
     "@material-ui/icons": "^1.0.0",
     "@theia/core": "latest",
@@ -76,8 +64,15 @@ open a new terminal, switch to a new directory and install generator-theia-exten
     "react-redux": "^4.4.9",
     "recompose": "^0.27.1",
     "redux": "^3.7.2",
-    "theia-tree-editor-extension": "./theia-tree-editor-extension-1.0.0.tgz"
+    "theia-tree-editor": "https://github.com/eclipsesource/theia-tree-editor.git#v0.0.1"
   }
+
+```
+**Add the following dependencies in the package.json of the browser-app**
+
+```js
+
+    "theia-tree-editor": "https://github.com/eclipsesource/theia-tree-editor.git#v0.0.1"
 
 ```
 
@@ -116,10 +111,8 @@ open a new terminal, switch to a new directory and install generator-theia-exten
     ]
 }
 ```
-> Now install all the dependencies
+**Now install all the dependencies**
 
-    yarn workspace task-editor-extension add ./theia-tree-editor-extension-1.0.0.tgz
-    cd ..
     yarn install
 
 ## Create Your Custom Editor
@@ -384,7 +377,7 @@ const calculateLabel =
 const imageGetter = (schemaId: string) =>
   !_.isEmpty(imageProvider) ? `icon ${imageProvider[schemaId]}` : '';
 
-const initStore = async() => {
+export const initStore = async() => {
   const uischema = {
     'type': 'MasterDetailLayout',
     'scope': '#'
@@ -434,7 +427,7 @@ const initStore = async() => {
       });
 };
 
-const TaskApp = defaultProps(
+export const TaskApp = defaultProps(
   {
     'filterPredicate': filterPredicate,
     'labelProvider': calculateLabel,
@@ -442,21 +435,9 @@ const TaskApp = defaultProps(
   }
 )(App);
 
-@injectable()
-export class TaskEditor extends TreeEditorOpenHandler {
-  constructor(app: FrontendApplication,
-              selectionService: SelectionService,
-              resourceProvider: ResourceProvider) {
-    super(app, selectionService, resourceProvider, initStore(), TaskApp);
-  }
-}
 ```
 
 > We initialize our store with helper functions (filterPredicate, labelProvider, imageProvider) that are required by TreeRenderer Component
-
-> TaskEditor extends its parent class by injecting store (created with `initStore()`) and our EditorComponent (TaskApp is a HOC which takes TreeRenderer as its input) into TreeEditorOpenHandler
-
-> Both arguments will be used to create a Widget to open JSON files by using our React application with its initialized store
 
 > To use stylesheets in your application, create a folder and name it `style` for our example. Create the following files.
 
@@ -490,23 +471,38 @@ export class TaskEditor extends TreeEditorOpenHandler {
 ```js
 import { ContainerModule } from "inversify";
 import {
-  TreeEditorOpenHandler
-} from 'theia-tree-editor-extension/lib/browser/theia-tree-editor-open-handler';
-import { OpenHandler } from "@theia/core/lib/browser";
-import { TaskEditor } from './task-editor';
+  CommandContribution,
+  MenuContribution,
+  ResourceProvider
+} from "@theia/core/lib/common";
+import { TreeEditorWidget, TreeEditorWidgetOptions } from 'theia-tree-editor/lib/browser';
+import { WidgetFactory } from '@theia/core/lib/browser';
+import URI from '@theia/core/lib/common/uri';
+import { TaskApp, initStore } from './uischema-editor';
 
-// Use the path of your css file
 import '../../src/browser/style/index.css';
 
 export default new ContainerModule(bind => {
-
-  bind(TreeEditorOpenHandler).to(TaskEditor);
-  bind(OpenHandler).to(TaskEditor);
+  // pass constructor arguments to the constructor and resolve these arguments
+  bind<WidgetFactory>(WidgetFactory).toDynamicValue(ctx => ({
+    id: 'theia-tree-editor',
+    async createWidget(uri: string): Promise<TreeEditorWidget> {
+      const { container } = ctx;
+      const resource = await container.get<ResourceProvider>(ResourceProvider)(new URI(uri));
+      const store = await initStore();
+      const child = container.createChild();
+      child.bind<TreeEditorWidgetOptions>(TreeEditorWidgetOptions)
+        .toConstantValue({ resource, store, EditorComponent: TaskApp, fileName: new URI(uri).path.base});
+      return child.get(TreeEditorWidget);
+    }
+  }));
 });
+
 ```
 > In Theia, everything is wired up via dependency injection. Read this [documentation](http://www.theia-ide.org/doc/authoring_extensions)  for more info.
 
-> We first inject our flagged arguments store and EditorComponent into TreeEditorOpenHandler. Then we bind our open handler implementation to the respective open handler interface
+> We create a new widget by setting TreeWidgetOptions which are resource (for file's content manipulation), store of the React App, React App and file name.
+We register this widget into the WidgetFactory so that we can access to the created widget whenever we need it.
 
 
 ## Running the Task Editor
