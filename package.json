@@ -1,20 +1,44 @@
 {
-  "private": true,
   "version": "0.0.1",
   "name": "theia-tree-editor",
   "description": "Theia Tree Editor",
+  "main": "lib/browser/index.js",
+  "typings": "lib/browser/index.d.ts",
+  "keywords": [
+    "theia-extension"
+  ],
+  "files": [
+    "lib",
+    "src"
+  ],
+  "dependencies": {
+    "@jsonforms/core": "^2.0.6",
+    "@theia/core": "latest",
+    "@theia/filesystem": "latest",
+    "@theia/editor": "latest",
+    "react": "^16.4.0",
+    "react-dom": "^16.4.0",
+    "react-redux": "^4.4.9",
+    "recompose": "^0.27.1",
+    "redux": "^3.7.2"
+  },
+  "devDependencies": {
+    "typescript": "latest"
+  },
   "scripts": {
-    "prepare": "lerna run prepare",
+    "prepare": "yarn run clean && yarn run build",
+    "clean": "rm -rf lib",
+    "build": "tsc",
+    "watch": "tsc -w",
     "major": "npm version major",
     "minor": "npm version minor",
     "patch": "npm version patch",
     "tag": "PACKAGE_VERSION=$(echo $npm_package_version) && sed -i '' '/lib/d' .gitignore && git add .gitignore && git commit -m $PACKAGE_VERSION && git tag v$PACKAGE_VERSION && git push origin v$PACKAGE_VERSION",
     "version": "echo $npm_package_version"
   },
-  "devDependencies": {
-    "lerna": "2.4.0"
-  },
-  "workspaces": [
-    "theia-tree-editor-extension"
+  "theiaExtensions": [
+    {
+      "frontend": "lib/browser/theia-tree-editor-frontend-module"
+    }
   ]
 }
