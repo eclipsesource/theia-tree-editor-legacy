@@ -34,7 +34,7 @@
     "major": "npm version major",
     "minor": "npm version minor",
     "patch": "npm version patch",
-    "tag": "PACKAGE_VERSION=$(echo $npm_package_version) && sed -i '' '/lib/d' .gitignore && git add .gitignore && git commit -m $PACKAGE_VERSION && git tag v$PACKAGE_VERSION && git push origin v$PACKAGE_VERSION",
+    "tag": "PACKAGE_VERSION=$(echo $npm_package_version) && sed -i '/lib/d' .gitignore && git add .gitignore && git commit -m $PACKAGE_VERSION && git tag v$PACKAGE_VERSION && git push origin v$PACKAGE_VERSION",
     "version": "echo $npm_package_version"
   },
   "theiaExtensions": [
