@@ -1,385 +1,286 @@
 # Theia Tree Editor
 
-The Theia Tree Editor showcases the integration of [JSON Forms](https://github.com/eclipsesource/jsonforms) with [Theia](https://github.com/theia-ide/theia).
+The Theia Tree Editor integrates [JSON Forms](https://github.com/eclipsesource/jsonforms) with the [Theia IDE](https://github.com/theia-ide/theia).
 
-## Getting started
+This component is not meant to be used standalone but instead enables the usage of the `TreeWithDetail` component
+of JSONForms within Theia.
 
-> Open your terminal and switch to a new directory
-
-    git clone git@github.com:eclipsesource/theia-tree-editor.git
-    cd theia-tree-editor
-    yarn install
-    yarn prepare
-
-> Use the generated module in your Theia application
-
-# How To Create A Sample Editor Application with Theia Tree Editor Extension
-
-> TreeEditorOpenHandler shouldn't be used as stand-alone extension.
-In this example, we are going to create a custom editor extension for task editing with the tree editor extension
-
+**NOTE**: This project is currently WIP and it's very likely that we'll be able to cut down the boilerplate, 
+so bear with us :) 
 
 ## Prerequisites
 
-> You’ll need node in version 8:
+You’ll need node in version 8:
 
     curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.5/install.sh | bash
     nvm install 8
 
-> and yarn
+and yarn
 
     npm install -g yarn
 
-> Also make sure your python --version points to a Python 2.x installation. Run the following command in your terminal.
+Also make sure your python --version points to a Python 2.x installation. Run the following command in your terminal.
 
     python --version
+    
+Additionally, also install yeoman and the theia extension generator for project scaffolding:
 
-## Project Layout
+    npm install -g yo generator-theia-extension    
 
-> Open a new terminal, switch to a new directory and install generator-theia-extension. Use the theia extension generator for project scaffolding
+## Getting started
 
-    npm install -g yo generator-theia-extension
-    mkdir task-editor
-    cd task-editor
-    yo theia-extension task-editor
-    cd task-editor-extension
+In this section we will walk you through the process of creating a very minimalistic extension based 
+on the theia tree editor extension and an example schema from the JSON schema homepage, which can be found 
+under the [Miscellaneous Examples](http://json-schema.org/learn/miscellaneous-examples.html) section. We'll
+call our editor `veggie-editor`.   
 
-> Install dependencies.
+First, let's scaffold a basic extension with the theia generator extension:
 
-**Add the following dependencies in the package.json of the task-editor-extension**
+
+    mkdir veggie-editor && cd veggie-editor
+    yo theia-extension veggie-editor
+    cd veggie-editor-extension
+
+Let's add a couple of dependencies with yarn (**TODO**: we shouldn't need that many deps, e.g. `recompose`, `lodash` etc.):
+
+    yarn add https://github.com/eclipsesource/theia-tree-editor.git#v0.0.5
+    yarn add @jsonforms/material-tree-renderer
+    yarn add @jsonforms/material-renderers
+    yarn add react-redux
+    yarn add lodash
+    yarn add recompose
+    yarn add lodash
+
+## JSON Schema
+
+Next, we'll add a basic JSON schema which describes the instances we want to work with. 
+For this example we'll use the [Array of things example schema](http://json-schema.org/learn/miscellaneous-examples.html)
+from the [JSON Schema examples section](http://json-schema.org/learn/). 
+
+**TODO (this might change soon)**: Unfortunately, we have to modify the schema a bit in order to allow JSON Forms mapping 
+subschemas. Therefore, we have to set `$id` properties for each definition we want to reference from within JSON Forms.
+ 
+In this case, we'll replace the `id` property with `$id` and give it a value of `#fruitsOrVeggies` 
+and we'll also add an additional `$id` to the `veggie` definition with the value of `#veggie`. 
+We save the modified schema in a file called `schema.ts`, within the `veggie-editor-extension/src` folder:
+
+### schema.ts
 
 ```js
-
-  "dependencies": {
-    "@jsonforms/core": "^2.0.6",
-    "@jsonforms/editor": "^2.0.6",
-    "@jsonforms/material-renderers": "^2.0.6",
-    "@material-ui/core": "^1.2.1",
-    "@material-ui/icons": "^1.0.0",
-    "@theia/core": "latest",
-    "json-refs": "^3.0.4",
-    "material-ui-pickers": "1.0.0-rc.9",
-    "react": "^16.4.0",
-    "react-dom": "^16.4.0",
-    "react-redux": "^4.4.9",
-    "recompose": "^0.27.1",
-    "redux": "^3.7.2",
-    "theia-tree-editor": "https://github.com/eclipsesource/theia-tree-editor.git#v0.0.1"
-  }
-
-```
-**Add the following dependencies in the package.json of the browser-app**
-
-```js
-
-    "theia-tree-editor": "https://github.com/eclipsesource/theia-tree-editor.git#v0.0.1"
-
-```
-
-**You can use the following `tsconfig.ts`**
-
-```js
-{
-    "compilerOptions": {
-        "declaration": true,
-        "noImplicitAny": false,
-        "noEmitOnError": false,
-        "noImplicitThis": true,
-        "noImplicitReturns": true,
-        "noUnusedLocals": true,
-        "strictNullChecks": false,
-        "experimentalDecorators": true,
-        "emitDecoratorMetadata": true,
-        "downlevelIteration": true,
-        "module": "esnext",
-        "moduleResolution": "node",
-        "target": "es5",
-        "jsx": "react",
-        "lib": [
-            "es6",
-            "dom"
-        ],
-        "sourceMap": true,
-        "suppressImplicitAnyIndexErrors": true,
-        "rootDir": "src",
-        "outDir": "lib",
-        "keyofStringsOnly": true
+export default {
+  $id: "#fruitsOrVeggies",
+  $schema: "http://json-schema.org/draft-07/schema#",
+  description: "A representation of a person, company, organization, or place",
+  type: "object",
+  properties: {
+    fruits: {
+      type: "array",
+      items: { type: "string" }
     },
-    "exclude": [
-        "node_modules",
-        "lib"
-    ]
-}
-```
-**Now install all the dependencies**
-
-    yarn install
-
-## Create Your Custom Editor
-
-    cd task-editor-extension
-
-> Create `config.ts`,`schema.ts` and `uischemata.ts` files
-
-**config.ts:**
-```js
-import { taskView, taskGroupView } from './uischemata';
-
-export const labelProvider = {
-  '#taskGroup': 'label',
-  '#task': 'name',
-};
-
-export const imageProvider = {
-  '#task': 'task',
-  '#taskGroup': 'taskGroup'
-};
-
-export const modelMapping = {
-  'attribute': '_type',
-  'mapping': {
-    'task': '#task',
-    'taskGroup': '#taskGroup'
-  }
-};
-
-export const detailSchemata = {
-  '#task': taskView,
-  '#taskGroup': taskGroupView,
-};
-```
-**schema.ts:**
-```js
-export const taskSchema = {
-  '$schema': 'http://json-schema.org/draft-07/schema',
-  'type': 'object',
-  'id': '#taskGroup',
-  'properties': {
-    '_type': {
-      'type': 'string',
-      'default': 'taskGroup'
-    },
-    'label': {
-      'type': 'string'
-    },
-    'tasks': {
-      'type': 'array',
-      'items': {
-        '$ref': '#/definitions/task'
-      }
+    vegetables: {
+      type: "array",
+      items: { $ref: "#/definitions/veggie" }
     }
   },
-  'additionalProperties': false,
-  'definitions': {
-    'task': {
-      'type': 'object',
-      'id': '#task',
-      'properties': {
-        '_type': {
-          'type': 'string',
-          'default': 'task'
+  definitions: {
+    veggie: {
+      $id: "#veggie",
+      type: "object",
+      required: [ "veggieName", "veggieLike" ],
+      properties: {
+        veggieName: {
+          type: "string",
+          description: "The name of the vegetable."
         },
-        'name': {
-          'type': 'string'
-        },
-        'subTasks': {
-          'type': 'array',
-          'items': {
-            '$ref': '#/definitions/task'
-          }
+        veggieLike: {
+          type: "boolean",
+          description: "Do I like this vegetable?"
         }
-      },
-      'required': [ 'name', 'priority' ],
-      'additionalProperties': false
+      }
     }
+  }
+}
+```
+
+
+
+## Configuration 
+
+Next up, we need to set-up a configuration object which describes a few additional properties of the schema. 
+All of the following will be goes into a file name `config.ts` with in `veggie-editor-extension/src` folder. 
+
+For determining the labels that are to be displayed within the master view of the tree renderer, 
+we set up a `labels` object . The format follows the convention of key-value pairs, where the key is 
+the `$id` value of sub schema and the value is the label to be shown. The label value is either a plain string 
+or an object with a `property` field. In the latter case the given property will be used to determine the 
+label of the object to be displayed, which allows for dynamic labels. Specifying a `constant` property is the same
+as specifying a plain string.
+
+### Labels
+
+```js
+export const labels = {
+	"#fruitsOrVeggies": {
+		constant: "Fruits/Vegetables"
+	},
+	"#veggie": {
+		property: "veggieName"
+	}
+}
+```
+
+In this example, we display a static string for the top node and a dynamic one for the objects that 
+conform to the `veggie` schema.
+
+### Images 
+
+TODO 
+
+### Model mapping
+
+The `modelMapping` describes how instances can be mapped to their corresponding schema. 
+The first property, `attribute`, determines which property should be used for identification purposes 
+while the `mapping` property maps possible value of the `attribute` property to the 
+respective `$id`s of the sub schemas.
+
+```js
+// TODO: rename?
+export const modelMapping = {
+	attribute: 'type',
+ 	mapping: {
+		fruitsOrVeggies: '#fruitsOrVeggies',
+		veggies: '#veggies'
+ 	}	
+};
+```
+
+### Detail UI schemas
+
+The `uischemas` object holds a mapping of schema ID to its respective UI schema, which should 
+be used while rendering the detail view of the `TreeWithDetail` renderer.
+
+```js
+
+export const uischemas = {
+  '#fruitsOrVeggies': {
+    type: 'VerticalLayout',
+    elements: [
+      {
+        type: 'Control',
+        scope: '#/properties/fruits'
+      },
+      {
+        type: 'Control',
+        scope: '#/properties/vegetables'
+      }
+    ]
+  },
+  '#veggie': {
+    type: 'HorizontalLayout',
+    elements: [
+      {
+        type: 'Control',
+        scope: '#/properties/veggieName'
+      },
+      {
+        type: 'Control',
+        scope: '#/properties/veggieLike'
+      }
+    ]
   }
 };
 ```
-**uischemata.ts:**
-```js
-export const taskGroupView = {
-  'type': 'VerticalLayout',
-  'elements': [
-    {
-      'type': 'Control',
-      'scope': '#/properties/label'
-    }
-  ]
-};
 
-export const taskView = {
-  'type': 'VerticalLayout',
-  'elements': [
-    {
-      'type': 'Control',
-      'scope': '#/properties/name'
-    }
-  ]
-};
+You can save and close `config.ts` now. We'll use it when we set up the Editor component.
+
+# Update tsconfig.json
+
+We need to update the generated `tsconfig.json` in order to support writing React extensions.
+Add the following properties to `tsconfig.json`:
+
+```js
+"compilerOptions": {
+   // ...
+   "strict": false,
+   "jsx": "react"
+},
+"exclude": [
+	"node_modules",
+	"lib"
+]
 ```
-> You have the required schema and mapping files that are needed for JSONForms Tree Renderer. Now create your React Component that uses JSONForms Tree Renderer. Name the file as `App.tsx`
+**NOTE**: turning of strict mode should be necessary of course, we need to fix the current issues
+
+## Editor
+
+With the configuration in place we can set up the App component, which will only act as a wrapper 
+around JSON Form's `TreeWithDetail` renderer. The code for the entire component looks as follows
+and should be saved within `veggie-editor-extension/src/VeggieEditor.tsx`.
 
 ```js
 import * as React from 'react';
+import _ as _ from 'lodash';
+import { TreeWithDetailRenderer } from '@jsonforms/material-tree-renderer';
 import { connect } from 'react-redux';
-import { TreeRenderer } from '@jsonforms/editor';
-import { getSchema, getUiSchema } from '@jsonforms/core';
-import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
+import {
+  TreeEditorProps,
+  mapStateToTreeEditorProps
+} from 'theia-tree-editor';
 
-const theme = createMuiTheme({
-  palette: {
-    type: 'dark',
-    primary: {
-      main: '#FFFFFF'
-    },
-    background: {
-      'default': '#1e1e1e'
+class VeggieEditor extends React.Component<TreeEditorProps, {}> {
+  
+  componentDidUpdate(prevProps) {
+    if (!_.isEqual(this.props.rootData, prevProps.rootData)) {
+      this.props.saveable.dirty = true;
     }
-  },
-  typography: {
-    fontSize: 10
   }
-});
-
-interface AppProps {
-  uischema: any;
-  schema: any;
-  rootData: any;
-  filterPredicate: any;
-  labelProvider: any;
-  imageProvider: any;
-}
-
-class App extends React.Component<AppProps, {}> {
 
   render() {
-    const { filterPredicate, labelProvider, imageProvider, uischema, schema } = this.props;
-
     return (
-      <MuiThemeProvider theme={theme}>
-        <div>
-          <TreeRenderer
-            uischema={uischema}
-            schema={schema}
-            filterPredicate={filterPredicate}
-            labelProvider={labelProvider}
-            imageProvider={imageProvider}
-          />
-        </div>
-      </MuiThemeProvider>
+      <TreeWithDetailRenderer {...this.props} />
     );
   }
 }
 
-const mapStateToProps = (state, ownProps) => {
-  return {
-    uischema: getUiSchema(state),
-    schema: getSchema(state),
-    filterPredicate: ownProps.filterPredicate,
-    labelProvider: ownProps.labelProvider,
-    imageProvider: ownProps.imageProvider
-  };
-};
-
-export default connect(mapStateToProps)(App);
+export default connect(mapStateToTreeEditorProps)(VeggieEditor);
 ```
 
-> After creating your React application, now you need to implement your custom open handler for your editor.
-Delete `task-editor-contribution.ts`. You are not going to need it for this sample app.
-Create a new file called `task-editor.ts`
+## App
 
-**task-editor.ts:**
+Now let's put our editor component to use. To do so, we import our Editor component
+and wire it up with the configuration with defined previously. We also need to take
+care of setting up the store. 
+
+The relevant code to do so is given below and should be placed into `veggie-editor-extension/src/App.tsx`:
 
 ```js
-import { injectable } from "inversify";
-import { FrontendApplication } from '@theia/core/lib/browser';
-import { SelectionService, ResourceProvider } from '@theia/core/lib/common';
+import { defaultProps } from 'recompose';
 import { combineReducers, createStore, Store } from 'redux';
-import { detailSchemata, imageProvider, labelProvider, modelMapping } from './config';
-import { taskSchema } from './schema';
 import { materialFields, materialRenderers } from '@jsonforms/material-renderers';
 import {
   Actions,
   jsonformsReducer,
-  JsonSchema4,
   RankedTester
 } from '@jsonforms/core';
 import {
-  editorReducer,
+  treeWithDetailReducer,
   findAllContainerProperties,
-  Property,
   setContainerProperties
-} from '@jsonforms/editor';
-import {
-  TreeEditorOpenHandler
-} from 'theia-tree-editor-extension/lib/browser/theia-tree-editor-open-handler';
-import * as JsonRefs from 'json-refs';
-import App from './App';
-import { defaultProps } from "recompose";
-import * as _ from 'lodash';
+} from '@jsonforms/material-tree-renderer';
+import { calculateLabel, filterPredicate } from 'theia-tree-editor';
 
-interface LabelDefinition {
-  /** A constant label value displayed for every object for which this label definition applies. */
-  constant?: string;
-  /** The property name that is used to get a variable part of an object's label. */
-  property?: string;
-}
+import schema from './schema';
 
-const filterPredicate = (data: Object) => {
-  return (property: Property): boolean => {
-    if (!_.isEmpty(modelMapping) &&
-      !_.isEmpty(modelMapping.mapping)) {
-      if (data[modelMapping.attribute]) {
-        return property.schema.id === modelMapping.mapping[data[modelMapping.attribute]];
-      }
-      return true;
-    }
+import {labels, modelMapping, uischemas} from './config';
+import VeggieEditor from './VeggieEditor';
 
-    return false;
-  };
-};
-const calculateLabel =
-  (schema: JsonSchema4) => (element: Object): string => {
 
-    if (!_.isEmpty(labelProvider) && labelProvider[schema.id] !== undefined) {
-
-      if (typeof labelProvider[schema.id] === 'string') {
-        // To be backwards compatible: a simple string is assumed to be a property name
-        return element[labelProvider[schema.id]];
-      }
-      if (typeof labelProvider[schema.id] === 'object') {
-        const info = labelProvider[schema.id] as LabelDefinition;
-        let label;
-        if (info.constant !== undefined) {
-          label = info.constant;
-        }
-        if (!_.isEmpty(info.property) && !_.isEmpty(element[info.property])) {
-          label = _.isEmpty(label) ?
-            element[info.property] :
-            `${label} ${element[info.property]}`;
-        }
-        if (label !== undefined) {
-          return label;
-        }
-      }
-    }
-
-    const namingKeys = Object
-      .keys(schema.properties)
-      .filter(key => key === 'id' || key === 'name');
-    if (namingKeys.length !== 0) {
-      return element[namingKeys[0]];
-    }
-
-    return JSON.stringify(element);
-  };
-
-const imageGetter = (schemaId: string) =>
-  !_.isEmpty(imageProvider) ? `icon ${imageProvider[schemaId]}` : '';
+const imageGetter = (schemaId: string) => 'icon-test';
+// !_.isEmpty(imageProvider) ? `icon ${imageProvider[schemaId]}` : '';
 
 export const initStore = async() => {
   const uischema = {
-    'type': 'MasterDetailLayout',
+    'type': 'TreeWithDetail',
     'scope': '#'
   };
   const renderers: { tester: RankedTester, renderer: any}[] = materialRenderers;
@@ -388,11 +289,11 @@ export const initStore = async() => {
     jsonforms: {
       renderers,
       fields,
-      editor: {
-        imageMapping: imageProvider,
-        labelMapping: labelProvider,
+      treeWithDetail: {
+        // imageMapping: imageProvider,
+        labelMapping: labels,
         modelMapping,
-        uiSchemata: detailSchemata
+        uiSchemata: uischemas
       }
     }
   };
@@ -401,89 +302,51 @@ export const initStore = async() => {
     combineReducers({
         jsonforms: jsonformsReducer(
           {
-            editor: editorReducer
+            treeWithDetail: treeWithDetailReducer
           }
         )
       }
     ),
-    {
-      ...jsonforms
-    }
+    { ...jsonforms }
   );
 
-  return await JsonRefs.resolveRefs(taskSchema)
-    .then(
-      resolvedSchema => {
-        store.dispatch(Actions.init({}, resolvedSchema.resolved, uischema));
+  store.dispatch(Actions.init({}, schema, uischema));
+  store.dispatch(setContainerProperties(findAllContainerProperties(schema, schema)));
 
-        store.dispatch(setContainerProperties(
-          findAllContainerProperties(resolvedSchema.resolved, resolvedSchema.resolved)));
-
-        return store;
-      },
-      err => {
-        console.log(err.stack);
-        return {};
-      });
+  return store;
 };
 
-export const TaskApp = defaultProps(
+export default defaultProps(
   {
     'filterPredicate': filterPredicate,
-    'labelProvider': calculateLabel,
+    'labelProvider': calculateLabel(labels),
     'imageProvider': imageGetter
   }
-)(App);
+)(VeggieEditor);
 
 ```
 
-> We initialize our store with helper functions (filterPredicate, labelProvider, imageProvider) that are required by TreeRenderer Component
+## Frontend module
 
-> To use stylesheets in your application, create a folder and name it `style` for our example. Create the following files.
+Finally, open the frontend module in `veggie-editor-extension/src/browser/veggie-editor-frontend-module.ts` which
+already has been generated by the extension generator and add the following binding:
 
-> For `ImageProvier` you need to provide icons (optional). Create `icons` folder in `style` folder and add your files there
+**NOTE**: explain what's going on here
 
-**example.css:**
+Add the following imports:
 
 ```js
-.icon {
-    background-repeat: no-repeat;
-}
-.icon.taskGroup {
-    background-image: url('./icons/TaskGroup.png');
-}
-.icon.task {
-    background-image: url('./icons/Task.png');
-}
+  // necessary imports
+  import { WidgetFactory } from "@theia/core/lib/browser";
+  import { ResourceProvider } from "@theia/core/lib/common";
+  import { TreeEditorWidget, TreeEditorWidgetOptions } from "theia-tree-editor";
+  import URI from "@theia/core/lib/common/uri";
+  import App, {initStore} from "../App";
 ```
 
-**index.css:**
+Then add the binding (**TODO**: is the ID correct?):
 
 ```js
-@import './example.css';
-
-```
-
-> Open `task-editor-frontend-module.ts`
-
-**task-editor-frontend-module.ts:**
-
-```js
-import { ContainerModule } from "inversify";
-import {
-  CommandContribution,
-  MenuContribution,
-  ResourceProvider
-} from "@theia/core/lib/common";
-import { TreeEditorWidget, TreeEditorWidgetOptions } from 'theia-tree-editor/lib/browser';
-import { WidgetFactory } from '@theia/core/lib/browser';
-import URI from '@theia/core/lib/common/uri';
-import { TaskApp, initStore } from './uischema-editor';
-
-import '../../src/browser/style/index.css';
-
-export default new ContainerModule(bind => {
-  // pass constructor arguments to the constructor and resolve these arguments
   bind<WidgetFactory>(WidgetFactory).toDynamicValue(ctx => ({
     id: 'theia-tree-editor',
     async createWidget(uri: string): Promise<TreeEditorWidget> {
@@ -492,27 +355,23 @@ export default new ContainerModule(bind => {
       const store = await initStore();
       const child = container.createChild();
       child.bind<TreeEditorWidgetOptions>(TreeEditorWidgetOptions)
-        .toConstantValue({ resource, store, EditorComponent: TaskApp, fileName: new URI(uri).path.base});
+        .toConstantValue({ resource, store, EditorComponent: App, fileName: new URI(uri).path.base});
       return child.get(TreeEditorWidget);
     }
   }));
-});
-
 ```
-> In Theia, everything is wired up via dependency injection. Read this [documentation](http://www.theia-ide.org/doc/authoring_extensions)  for more info.
 
-> We create a new widget by setting TreeWidgetOptions which are resource (for file's content manipulation), store of the React App, React App and file name.
-We register this widget into the WidgetFactory so that we can access to the created widget whenever we need it.
+That's it, we are finally good to go!
 
+## Running the extension
 
-## Running the Task Editor
+1. Run `yarn start` within `browser-app` directory
+2. Run `yarn watch --mode development` within `browser-app` directory
+3. Run `yarn watch` within the directory of your extension
 
-    cd root_path_to_project_directory
-    yarn prepare
-    cd browser-app
-    yarn start
+This will cause your extension and the browser-app to be rebuilt upon each 
+change you do in the extension and also start a webserver on `http://localhost:3000`.
+Note however, that a refresh is not triggered automatically.
 
-
-> Open http://localhost:3000 in the browser.
-On the `File Menu`, open an empty JSON file or create one
-Right click JSON file and select `Open With -> Open With Tree Editor`
+Within the browser, navigate to the `File Menu`, open an empty JSON file or, alternatively, create one.
+Right click JSON file and select `Open With` and your extension should be listed.
