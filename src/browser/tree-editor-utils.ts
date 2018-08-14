@@ -1,5 +1,5 @@
 import { JsonSchema7 } from '@jsonforms/core';
-import { getSchema, getUiSchema } from '@jsonforms/core';
+import { getData, getSchema, getUiSchema } from '@jsonforms/core';
 import { Property } from '@jsonforms/material-tree-renderer';
 
 export interface TreeEditorProps {
@@ -9,8 +9,8 @@ export interface TreeEditorProps {
   filterPredicate: any;
   labelProvider: any;
   imageProvider: any;
+  saveable: any;
 }
-
 
 export interface LabelDefinition {
   /** A constant label value displayed for every object for which this label definition applies. */
@@ -75,6 +75,7 @@ export const mapStateToTreeEditorProps = (state, ownProps) => {
     schema: getSchema(state),
     filterPredicate: ownProps.filterPredicate,
     labelProvider: ownProps.labelProvider,
-    imageProvider: ownProps.imageProvider
+    imageProvider: ownProps.imageProvider,
+    rootData: getData(state)
   };
 };
