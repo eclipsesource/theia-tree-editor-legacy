@@ -4,9 +4,6 @@
   "description": "Theia Tree Editor",
   "main": "lib/browser/index.js",
   "typings": "lib/browser/index.d.ts",
-  "keywords": [
-    "theia-extension"
-  ],
   "files": [
     "lib",
     "src"
@@ -36,10 +33,5 @@
     "patch": "npm version patch",
     "tag": "PACKAGE_VERSION=$(echo $npm_package_version) && sed -i '/lib/d' .gitignore && git add .gitignore && git commit -m $PACKAGE_VERSION && git tag v$PACKAGE_VERSION && git push origin v$PACKAGE_VERSION",
     "version": "echo $npm_package_version"
-  },
-  "theiaExtensions": [
-    {
-      "frontend": "lib/browser/theia-tree-editor-frontend-module"
-    }
-  ]
+  }
 }

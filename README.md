@@ -339,12 +339,13 @@ Add the following imports:
   // necessary imports
   import { WidgetFactory } from "@theia/core/lib/browser";
   import { ResourceProvider } from "@theia/core/lib/common";
-  import { TreeEditorWidget, TreeEditorWidgetOptions } from "theia-tree-editor";
+  import { TheiaTreeEditorContribution, TreeEditorWidget, TreeEditorWidgetOptions } from "theia-tree-editor";
   import URI from "@theia/core/lib/common/uri";
   import App, {initStore} from "../App";
 ```
 
-Then add the binding (**TODO**: is the ID correct?):
+Then add the bindings (**TODO**: is the ID correct?). If you want to use another implementation
+of the `TheiaTreeEditorContribution` replace the imports with your version of it:
 
 ```js
   bind<WidgetFactory>(WidgetFactory).toDynamicValue(ctx => ({
@@ -359,6 +360,12 @@ Then add the binding (**TODO**: is the ID correct?):
       return child.get(TreeEditorWidget);
     }
   }));
+  bind(TreeEditorWidget).toSelf();
+   
+  bind(TheiaTreeEditorContribution).toSelf().inSingletonScope();
+  [CommandContribution, MenuContribution, OpenHandler].forEach(serviceIdentifier =>
+    bind(serviceIdentifier).toService(TheiaTreeEditorContribution)
+  );
 ```
 
 That's it, we are finally good to go!
