@@ -4,7 +4,6 @@ import { Resource } from '@theia/core/lib/common';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { TreeEditorSaveable } from './TreeEditorSaveable';
 import { inject, injectable } from 'inversify';
 import { Actions } from '@jsonforms/core';
 import { withProps } from 'recompose';
@@ -15,6 +14,7 @@ export interface TreeEditorWidgetOptions {
   store: any;
   EditorComponent: React.Component;
   fileName: string;
+  saveable: Saveable;
 }
 
 let widgetCounter = 0;
@@ -32,7 +32,7 @@ export class TreeEditorWidget extends BaseWidget implements SaveableSource {
     this.resource = this.options.resource;
     this.store = this.options.store;
     this.addClass('tree-class');
-    this.saveable = new TreeEditorSaveable(this.resource, this.store);
+    this.saveable = this.options.saveable;
     this.title.closable = true;
     this.title.label = this.options.fileName;
     this.title.caption = this.title.label;
