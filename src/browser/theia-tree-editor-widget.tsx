@@ -15,6 +15,7 @@ export interface TreeEditorWidgetOptions {
   EditorComponent: React.Component;
   fileName: string;
   saveable: Saveable;
+  onResourceLoad: any;
 }
 
 let widgetCounter = 0;
@@ -36,24 +37,19 @@ export class TreeEditorWidget extends BaseWidget implements SaveableSource {
     this.title.closable = true;
     this.title.label = this.options.fileName;
     this.title.caption = this.title.label;
-    this.resource.readContents().then(content => {
-      let parsedContent;
-      try {
-        parsedContent = JSON.parse(content);
-      } catch (err) {
-        console.warn('Invalid content', err);
-        parsedContent = {};
-      }
-      Promise.resolve(this.store).then(initializedStore => {
-        initializedStore.dispatch(Actions.update('', () => parsedContent));
-        const Editor = withProps({'saveable': this.saveable})(this.options.EditorComponent);
-        ReactDOM.render(
-          <Provider store={initializedStore}>
-            <Editor/>
-          </Provider>,
-          this.node);
+    this.resource.readContents()
+      .then(content => this.options.onResourceLoad(content))
+      .then(parsedContent => {
+        Promise.resolve(this.store).then(initializedStore => {
+          initializedStore.dispatch(Actions.update('', () => parsedContent));
+          const Editor = withProps({'saveable': this.saveable})(this.options.EditorComponent);
+          ReactDOM.render(
+            <Provider store={initializedStore}>
+              <Editor/>
+            </Provider>,
+            this.node);
+        });
       });
-    });
   }
 
   onActivateRequest(msg: Message): void {
