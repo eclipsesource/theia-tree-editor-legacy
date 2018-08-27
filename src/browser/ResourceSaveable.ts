@@ -16,7 +16,7 @@ export class ResourceSaveable implements Saveable {
     }
   );
 
-  constructor(private resource: Resource, private getData: any) {}
+  constructor(private resource: Resource, private getData: () => any) {}
 
   save(): MaybePromise<void> {
     return this.onSave(this.getData()).then(this.doSave)

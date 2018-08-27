@@ -38,7 +38,19 @@ export class TreeEditorWidget extends BaseWidget implements SaveableSource {
     this.title.label = this.options.fileName;
     this.title.caption = this.title.label;
     this.resource.readContents()
-      .then(content => this.options.onResourceLoad(content))
+      .then(content => {
+        if(this.options.onResourceLoad === undefined) {
+          let parsedContent;
+          try {
+            parsedContent = JSON.parse(content);
+          } catch (err) {
+            console.warn('Invalid content', err);
+            parsedContent = {};
+          }
+          return parsedContent;
+        }
+        return this.options.onResourceLoad(content);
+      })
       .then(parsedContent => {
         Promise.resolve(this.store).then(initializedStore => {
           initializedStore.dispatch(Actions.update('', () => parsedContent));
