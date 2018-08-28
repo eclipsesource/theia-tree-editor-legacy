@@ -16,7 +16,6 @@ import { OpenerOptions, WidgetManager, WidgetOpenHandler } from '@theia/core/lib
 import { EditorContextMenu } from '@theia/editor/lib/browser';
 import { TreeEditorWidget } from './theia-tree-editor-widget';
 
-
 export const UISchemaDownloadCommand = {
   id: 'UISchemaDownload.command',
   label: "Download UI Schema"
