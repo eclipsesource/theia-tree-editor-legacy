@@ -17,6 +17,16 @@ export interface TreeEditorWidgetOptions {
   saveable: Saveable;
   onResourceLoad: any;
 }
+const defaultResourceParser = (content: string): Promise<any> => {
+  let parsedContent;
+  try {
+    parsedContent = JSON.parse(content);
+  } catch (err) {
+    console.warn('Invalid content', err);
+    parsedContent = {};
+  }
+  return parsedContent;
+};
 
 let widgetCounter = 0;
 @injectable()
@@ -40,14 +50,7 @@ export class TreeEditorWidget extends BaseWidget implements SaveableSource {
     this.resource.readContents()
       .then(content => {
         if(this.options.onResourceLoad === undefined) {
-          let parsedContent;
-          try {
-            parsedContent = JSON.parse(content);
-          } catch (err) {
-            console.warn('Invalid content', err);
-            parsedContent = {};
-          }
-          return parsedContent;
+          return defaultResourceParser(content);
         }
         return this.options.onResourceLoad(content);
       })
