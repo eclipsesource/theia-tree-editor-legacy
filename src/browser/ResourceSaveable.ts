@@ -1,5 +1,12 @@
-import { Disposable, Event, MaybePromise, Resource } from '@theia/core/lib/common';
+import {
+  Disposable,
+  Event,
+  MaybePromise,
+  MessageService,
+  Resource
+} from '@theia/core/lib/common';
 import { Saveable } from "@theia/core/lib/browser";
+import { inject } from "inversify";
 
 export class ResourceSaveable implements Saveable {
   autoSave;
@@ -16,20 +23,23 @@ export class ResourceSaveable implements Saveable {
     }
   );
 
-  constructor(private resource: Resource, private getData: () => any) {}
+  constructor(private resource: Resource,
+              private getData: () => any,
+              @inject(MessageService) private readonly messageService: MessageService
+  ) {}
 
   save(): MaybePromise<void> {
     return this.onSave(this.getData()).then(this.doSave)
   }
 
   doSave = (content: string): MaybePromise<void> => {
-    if ( this.resource.saveContents !== undefined ) {
+    if ( this.resource === undefined || this.resource.saveContents !== undefined ) {
       return this.resource.saveContents(content, { encoding: 'UTF-8' })
         .then(() => {
           this.dirty = false;
       });
     } else {
-      console.warn('resource cannot save');
+      this.messageService.error('Save failed: Undefined Resource');
       return undefined;
     }
   }
