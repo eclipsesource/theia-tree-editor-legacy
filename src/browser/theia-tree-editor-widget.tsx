@@ -30,6 +30,7 @@ const defaultResourceParser = (content: string): Promise<any> => {
 
 let widgetCounter = 0;
 export const DIRTY_CLASS = 'theia-mod-dirty';
+const JSON_ICON_CLASS = 'database-icon medium-yellow file-icon';
 @injectable()
 export class TreeEditorWidget extends BaseWidget implements SaveableSource {
   saveable: Saveable;
@@ -48,6 +49,8 @@ export class TreeEditorWidget extends BaseWidget implements SaveableSource {
     this.title.closable = true;
     this.title.label = this.options.fileName;
     this.title.caption = this.title.label;
+    this.title.iconClass =
+      this.title.iconClass.replace('no-icon', '') + `${JSON_ICON_CLASS}`;
     this.resource.readContents()
       .then(content => {
         if(this.options.onResourceLoad === undefined) {
