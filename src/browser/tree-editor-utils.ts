@@ -1,4 +1,4 @@
-import { JsonSchema7 } from '@jsonforms/core';
+import {JsonSchema, JsonSchema4, JsonSchema7} from '@jsonforms/core';
 import { getData, getSchema, getUiSchema } from '@jsonforms/core';
 import { Property } from '@jsonforms/material-tree-renderer';
 
@@ -56,11 +56,15 @@ export const calculateLabel = (labels) =>
     return JSON.stringify(element);
   };
 
-export const filterPredicate = (modelMapping) => (data: Object) => {
+export const filterPredicate = (modelMapping) => (data: any) => {
   return (property: Property): boolean => {
     if (modelMapping !== undefined && modelMapping.mapping !== undefined) {
       if (data[modelMapping.attribute]) {
-        return property.schema.$id === modelMapping.mapping[data[modelMapping.attribute]];
+        if (isJsonSchema7(property.schema)) {
+          return property.schema.$id === modelMapping.mapping[data[modelMapping.attribute]];
+        } else if (isJsonSchema4(property.schema)) {
+          return property.schema.id === modelMapping.mapping[data[modelMapping.attribute]];
+        }
       }
       return true;
     }
@@ -68,6 +72,9 @@ export const filterPredicate = (modelMapping) => (data: Object) => {
     return false;
   };
 };
+
+const isJsonSchema7 = (schema: JsonSchema): schema is JsonSchema7 => schema['$id'] !== undefined;
+const isJsonSchema4 = (schema: JsonSchema): schema is JsonSchema4 => schema['id'] !== undefined;
 
 export const mapStateToTreeEditorProps = (state, ownProps) => {
   return {
