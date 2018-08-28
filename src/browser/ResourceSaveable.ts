@@ -1,5 +1,8 @@
 import { Disposable, Event, MaybePromise, Resource } from '@theia/core/lib/common';
-import { Saveable } from "@theia/core/lib/browser";
+import {Saveable, WidgetManager} from "@theia/core/lib/browser";
+import { DIRTY_CLASS, TreeEditorWidget } from './theia-tree-editor-widget';
+import * as _ from 'lodash';
+import { unmanaged } from 'inversify';
 
 export class ResourceSaveable implements Saveable {
   autoSave;
@@ -16,7 +19,9 @@ export class ResourceSaveable implements Saveable {
     }
   );
 
-  constructor(private resource: Resource, private getData: () => any) {}
+  constructor(private resource: Resource,
+              private getData: () => any,
+              @unmanaged() protected readonly widgetManager: WidgetManager) {}
 
   save(): MaybePromise<void> {
     return this.onSave(this.getData()).then(this.doSave)
@@ -27,6 +32,9 @@ export class ResourceSaveable implements Saveable {
       return this.resource.saveContents(content, { encoding: 'UTF-8' })
         .then(() => {
           this.dirty = false;
+          const widget = _.head(this.widgetManager.getWidgets('theia-tree-editor')) as TreeEditorWidget;
+          const dirtyClass = ` ${DIRTY_CLASS}`;
+          widget.title.className = widget.title.className.replace(dirtyClass, '');
       });
     } else {
       console.warn('resource cannot save');

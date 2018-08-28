@@ -29,6 +29,7 @@ const defaultResourceParser = (content: string): Promise<any> => {
 };
 
 let widgetCounter = 0;
+export const DIRTY_CLASS = 'theia-mod-dirty';
 @injectable()
 export class TreeEditorWidget extends BaseWidget implements SaveableSource {
   saveable: Saveable;
@@ -57,7 +58,7 @@ export class TreeEditorWidget extends BaseWidget implements SaveableSource {
       .then(parsedContent => {
         Promise.resolve(this.store).then(initializedStore => {
           initializedStore.dispatch(Actions.update('', () => parsedContent));
-          const Editor = withProps({'saveable': this.saveable})(this.options.EditorComponent);
+          const Editor = withProps({'widget': this})(this.options.EditorComponent);
           ReactDOM.render(
             <Provider store={initializedStore}>
               <Editor/>
