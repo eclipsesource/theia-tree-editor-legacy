@@ -4,7 +4,6 @@ import { Resource } from '@theia/core/lib/common';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { TreeEditorSaveable } from './TreeEditorSaveable';
 import { inject, injectable } from 'inversify';
 import { Actions } from '@jsonforms/core';
 import { withProps } from 'recompose';
@@ -15,7 +14,19 @@ export interface TreeEditorWidgetOptions {
   store: any;
   EditorComponent: React.Component;
   fileName: string;
+  saveable: Saveable;
+  onResourceLoad: any;
 }
+const defaultResourceParser = (content: string): Promise<any> => {
+  let parsedContent;
+  try {
+    parsedContent = JSON.parse(content);
+  } catch (err) {
+    console.warn('Invalid content', err);
+    parsedContent = {};
+  }
+  return parsedContent;
+};
 
 let widgetCounter = 0;
 @injectable()
@@ -32,28 +43,28 @@ export class TreeEditorWidget extends BaseWidget implements SaveableSource {
     this.resource = this.options.resource;
     this.store = this.options.store;
     this.addClass('tree-class');
-    this.saveable = new TreeEditorSaveable(this.resource, this.store);
+    this.saveable = this.options.saveable;
     this.title.closable = true;
     this.title.label = this.options.fileName;
     this.title.caption = this.title.label;
-    this.resource.readContents().then(content => {
-      let parsedContent;
-      try {
-        parsedContent = JSON.parse(content);
-      } catch (err) {
-        console.warn('Invalid content', err);
-        parsedContent = {};
-      }
-      Promise.resolve(this.store).then(initializedStore => {
-        initializedStore.dispatch(Actions.update('', () => parsedContent));
-        const Editor = withProps({'saveable': this.saveable})(this.options.EditorComponent);
-        ReactDOM.render(
-          <Provider store={initializedStore}>
-            <Editor/>
-          </Provider>,
-          this.node);
+    this.resource.readContents()
+      .then(content => {
+        if(this.options.onResourceLoad === undefined) {
+          return defaultResourceParser(content);
+        }
+        return this.options.onResourceLoad(content);
+      })
+      .then(parsedContent => {
+        Promise.resolve(this.store).then(initializedStore => {
+          initializedStore.dispatch(Actions.update('', () => parsedContent));
+          const Editor = withProps({'saveable': this.saveable})(this.options.EditorComponent);
+          ReactDOM.render(
+            <Provider store={initializedStore}>
+              <Editor/>
+            </Provider>,
+            this.node);
+        });
       });
-    });
   }
 
   onActivateRequest(msg: Message): void {
