@@ -12,7 +12,7 @@ import {
   TreeEditorWidget,
   TreeEditorWidgetOptions,
   TheiaTreeEditorContribution,
-} from 'tree-editor-extension/lib/browser';
+} from 'tree-editor-extension';
 import URI from "@theia/core/lib/common/uri";
 import App, {initStore} from "../App";
 import { OpenHandler } from '@theia/core/lib/browser';
