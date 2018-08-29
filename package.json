@@ -10,7 +10,7 @@
   ],
   "dependencies": {
     "@jsonforms/core": "^2.0.8",
-    "@jsonforms/material-tree-renderer": "^2.0.8",
+    "@jsonforms/material-tree-renderer": "^2.0.9",
     "@theia/core": "latest",
     "@theia/editor": "latest",
     "@theia/filesystem": "latest",
