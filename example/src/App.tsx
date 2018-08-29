@@ -11,7 +11,7 @@ import {
   findAllContainerProperties,
   setContainerProperties
 } from '@jsonforms/material-tree-renderer';
-import { calculateLabel, filterPredicate } from 'tree-editor-extension/lib/browser';
+import { calculateLabel, filterPredicate } from 'tree-editor-extension';
 
 import schema from './schema';
 

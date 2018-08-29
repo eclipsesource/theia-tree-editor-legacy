@@ -5,7 +5,7 @@ import {
   DIRTY_CLASS,
   TreeEditorProps,
   mapStateToTreeEditorProps
-} from 'tree-editor-extension/lib/browser';
+} from 'tree-editor-extension';
 import * as _ from 'lodash';
 
 class VeggieEditor extends React.Component<TreeEditorProps, {}> {

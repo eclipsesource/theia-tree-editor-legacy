@@ -232,7 +232,7 @@ import {
   DIRTY_CLASS,
   TreeEditorProps,
   mapStateToTreeEditorProps
-} from 'theia-tree-editor/tree-editor-extension/lib/browser';
+} from 'theia-tree-editor';
 
 class VeggieEditor extends React.Component<TreeEditorProps, {}> {
 
@@ -361,7 +361,7 @@ import {
   TreeEditorWidget,
   TreeEditorWidgetOptions,
   TheiaTreeEditorContribution,
-} from 'theia-tree-editor/tree-editor-extension/lib/browser';
+} from 'theia-tree-editor';
 import URI from "@theia/core/lib/common/uri";
 import App, {initStore} from "../App";
 import { OpenHandler } from '@theia/core/lib/browser';
