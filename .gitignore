@@ -6,6 +6,7 @@ docs
 *.log
 *-app/*
 !*-app/package.json
+!/tree-editor-extension/lib
 
 .idea/
 .vscode/

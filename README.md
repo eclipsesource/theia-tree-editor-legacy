@@ -5,8 +5,8 @@ The Theia Tree Editor integrates [JSON Forms](https://github.com/eclipsesource/j
 This component is not meant to be used standalone but instead enables the usage of the `TreeWithDetail` component
 of JSONForms within Theia.
 
-**NOTE**: This project is currently WIP and it's very likely that we'll be able to cut down the boilerplate, 
-so bear with us :) 
+**NOTE**: This project is currently WIP and it's very likely that we'll be able to cut down the boilerplate,
+so bear with us :)
 
 ## Prerequisites
 
@@ -22,17 +22,23 @@ and yarn
 Also make sure your python --version points to a Python 2.x installation. Run the following command in your terminal.
 
     python --version
-    
+
 Additionally, also install yeoman and the theia extension generator for project scaffolding:
 
-    npm install -g yo generator-theia-extension    
+    npm install -g yo generator-theia-extension
+
+## Running the example application
+
+    1. Run `yarn install` within project root directory
+    2. Run `yarn start` within `browser-app` directory
+
 
 ## Getting started
 
-In this section we will walk you through the process of creating a very minimalistic extension based 
-on the theia tree editor extension and an example schema from the JSON schema homepage, which can be found 
+In this section we will walk you through the process of creating a very minimalistic extension based
+on the theia tree editor extension and an example schema from the JSON schema homepage, which can be found
 under the [Miscellaneous Examples](http://json-schema.org/learn/miscellaneous-examples.html) section. We'll
-call our editor `veggie-editor`.   
+call our editor `veggie-editor`.
 
 First, let's scaffold a basic extension with the theia generator extension:
 
@@ -53,15 +59,15 @@ Let's add a couple of dependencies with yarn (**TODO**: we shouldn't need that m
 
 ## JSON Schema
 
-Next, we'll add a basic JSON schema which describes the instances we want to work with. 
+Next, we'll add a basic JSON schema which describes the instances we want to work with.
 For this example we'll use the [Array of things example schema](http://json-schema.org/learn/miscellaneous-examples.html)
-from the [JSON Schema examples section](http://json-schema.org/learn/). 
+from the [JSON Schema examples section](http://json-schema.org/learn/).
 
-**TODO (this might change soon)**: Unfortunately, we have to modify the schema a bit in order to allow JSON Forms mapping 
+**TODO (this might change soon)**: Unfortunately, we have to modify the schema a bit in order to allow JSON Forms mapping
 subschemas. Therefore, we have to set `$id` properties for each definition we want to reference from within JSON Forms.
- 
-In this case, we'll replace the `id` property with `$id` and give it a value of `#fruitsOrVeggies` 
-and we'll also add an additional `$id` to the `veggie` definition with the value of `#veggie`. 
+
+In this case, we'll replace the `id` property with `$id` and give it a value of `#fruitsOrVeggies`
+and we'll also add an additional `$id` to the `veggie` definition with the value of `#veggie`.
 We save the modified schema in a file called `schema.ts`, within the `veggie-editor-extension/src` folder:
 
 ### schema.ts
@@ -104,15 +110,15 @@ export default {
 
 
 
-## Configuration 
+## Configuration
 
-Next up, we need to set-up a configuration object which describes a few additional properties of the schema. 
-All of the following will be goes into a file name `config.ts` with in `veggie-editor-extension/src` folder. 
+Next up, we need to set-up a configuration object which describes a few additional properties of the schema.
+All of the following will be goes into a file name `config.ts` with in `veggie-editor-extension/src` folder.
 
-For determining the labels that are to be displayed within the master view of the tree renderer, 
-we set up a `labels` object . The format follows the convention of key-value pairs, where the key is 
-the `$id` value of sub schema and the value is the label to be shown. The label value is either a plain string 
-or an object with a `property` field. In the latter case the given property will be used to determine the 
+For determining the labels that are to be displayed within the master view of the tree renderer,
+we set up a `labels` object . The format follows the convention of key-value pairs, where the key is
+the `$id` value of sub schema and the value is the label to be shown. The label value is either a plain string
+or an object with a `property` field. In the latter case the given property will be used to determine the
 label of the object to be displayed, which allows for dynamic labels. Specifying a `constant` property is the same
 as specifying a plain string.
 
@@ -129,18 +135,18 @@ export const labels = {
 }
 ```
 
-In this example, we display a static string for the top node and a dynamic one for the objects that 
+In this example, we display a static string for the top node and a dynamic one for the objects that
 conform to the `veggie` schema.
 
-### Images 
+### Images
 
-TODO 
+TODO
 
 ### Model mapping
 
-The `modelMapping` describes how instances can be mapped to their corresponding schema. 
-The first property, `attribute`, determines which property should be used for identification purposes 
-while the `mapping` property maps possible value of the `attribute` property to the 
+The `modelMapping` describes how instances can be mapped to their corresponding schema.
+The first property, `attribute`, determines which property should be used for identification purposes
+while the `mapping` property maps possible value of the `attribute` property to the
 respective `$id`s of the sub schemas.
 
 ```js
@@ -150,13 +156,13 @@ export const modelMapping = {
  	mapping: {
 		fruitsOrVeggies: '#fruitsOrVeggies',
 		veggies: '#veggies'
- 	}	
+ 	}
 };
 ```
 
 ### Detail UI schemas
 
-The `uischemas` object holds a mapping of schema ID to its respective UI schema, which should 
+The `uischemas` object holds a mapping of schema ID to its respective UI schema, which should
 be used while rendering the detail view of the `TreeWithDetail` renderer.
 
 ```js
@@ -213,7 +219,7 @@ Add the following properties to `tsconfig.json`:
 
 ## Editor
 
-With the configuration in place we can set up the App component, which will only act as a wrapper 
+With the configuration in place we can set up the App component, which will only act as a wrapper
 around JSON Form's `TreeWithDetail` renderer. The code for the entire component looks as follows
 and should be saved within `veggie-editor-extension/src/VeggieEditor.tsx`.
 
@@ -223,15 +229,20 @@ import _ as _ from 'lodash';
 import { TreeWithDetailRenderer } from '@jsonforms/material-tree-renderer';
 import { connect } from 'react-redux';
 import {
+  DIRTY_CLASS,
   TreeEditorProps,
   mapStateToTreeEditorProps
-} from 'theia-tree-editor';
+} from 'theia-tree-editor/tree-editor-extension/lib/browser';
 
 class VeggieEditor extends React.Component<TreeEditorProps, {}> {
-  
+
   componentDidUpdate(prevProps) {
+    const dirtyClass = ` ${DIRTY_CLASS}`;
     if (!_.isEqual(this.props.rootData, prevProps.rootData)) {
-      this.props.saveable.dirty = true;
+      this.props.widget.saveable.dirty = true;
+      if (!this.props.widget.title.className.includes(dirtyClass)) {
+        this.props.widget.title.className += dirtyClass;
+      }
     }
   }
 
@@ -249,7 +260,7 @@ export default connect(mapStateToTreeEditorProps)(VeggieEditor);
 
 Now let's put our editor component to use. To do so, we import our Editor component
 and wire it up with the configuration with defined previously. We also need to take
-care of setting up the store. 
+care of setting up the store.
 
 The relevant code to do so is given below and should be placed into `veggie-editor-extension/src/App.tsx`:
 
@@ -337,11 +348,24 @@ Add the following imports:
 
 ```js
   // necessary imports
-  import { WidgetFactory } from "@theia/core/lib/browser";
-  import { ResourceProvider } from "@theia/core/lib/common";
-  import { TheiaTreeEditorContribution, TreeEditorWidget, TreeEditorWidgetOptions } from "theia-tree-editor";
-  import URI from "@theia/core/lib/common/uri";
-  import App, {initStore} from "../App";
+import {ContainerModule} from "inversify";
+import { WidgetFactory, WidgetManager } from '@theia/core/lib/browser';
+import {
+  CommandContribution,
+  MenuContribution,
+  MessageService,
+  ResourceProvider
+} from "@theia/core/lib/common";
+import {
+  DirtyResourceSavable,
+  TreeEditorWidget,
+  TreeEditorWidgetOptions,
+  TheiaTreeEditorContribution,
+} from 'theia-tree-editor/tree-editor-extension/lib/browser';
+import URI from "@theia/core/lib/common/uri";
+import App, {initStore} from "../App";
+import { OpenHandler } from '@theia/core/lib/browser';
+import { getData } from '@jsonforms/core';
 ```
 
 Then add the bindings (**TODO**: is the ID correct?). If you want to use another implementation
@@ -353,15 +377,38 @@ of the `TheiaTreeEditorContribution` replace the imports with your version of it
     async createWidget(uri: string): Promise<TreeEditorWidget> {
       const { container } = ctx;
       const resource = await container.get<ResourceProvider>(ResourceProvider)(new URI(uri));
+      const widgetManager = await container.get<WidgetManager>(WidgetManager);
+      const messageService = await container.get<MessageService>(MessageService);
       const store = await initStore();
+      const onResourceLoad = (content: string): Promise<any> => {
+        let parsedContent;
+        try {
+          parsedContent = JSON.parse(content);
+        } catch (err) {
+          console.warn('Invalid content', err);
+          parsedContent = {};
+        }
+        return Promise.resolve(parsedContent);
+      };
+      const saveable = new DirtyResourceSavable(resource,
+                                                () => getData(store.getState()),
+                                                widgetManager,
+                                                messageService);
       const child = container.createChild();
       child.bind<TreeEditorWidgetOptions>(TreeEditorWidgetOptions)
-        .toConstantValue({ resource, store, EditorComponent: App, fileName: new URI(uri).path.base});
+        .toConstantValue({
+          resource,
+          store,
+          EditorComponent: App,
+          fileName: new URI(uri).path.base,
+          saveable,
+          onResourceLoad
+        });
       return child.get(TreeEditorWidget);
     }
   }));
   bind(TreeEditorWidget).toSelf();
-   
+
   bind(TheiaTreeEditorContribution).toSelf().inSingletonScope();
   [CommandContribution, MenuContribution, OpenHandler].forEach(serviceIdentifier =>
     bind(serviceIdentifier).toService(TheiaTreeEditorContribution)
@@ -376,7 +423,7 @@ That's it, we are finally good to go!
 2. Run `yarn watch --mode development` within `browser-app` directory
 3. Run `yarn watch` within the directory of your extension
 
-This will cause your extension and the browser-app to be rebuilt upon each 
+This will cause your extension and the browser-app to be rebuilt upon each
 change you do in the extension and also start a webserver on `http://localhost:3000`.
 Note however, that a refresh is not triggered automatically.
 

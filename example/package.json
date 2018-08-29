@@ -1,0 +1,34 @@
+{
+  "name": "example",
+  "keywords": [
+    "theia-extension"
+  ],
+  "version": "0.0.0",
+  "files": [
+    "lib",
+    "src"
+  ],
+  "dependencies": {
+    "@jsonforms/material-renderers": "^2.0.7",
+    "@jsonforms/material-tree-renderer": "^2.0.7",
+    "@theia/core": "latest",
+    "react-redux": "^5.0.7",
+    "recompose": "^0.28.2",
+    "tree-editor-extension": "^0.0.1"
+  },
+  "devDependencies": {
+    "rimraf": "latest",
+    "typescript": "latest"
+  },
+  "scripts": {
+    "prepare": "yarn run clean && yarn run build",
+    "clean": "rimraf lib",
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "theiaExtensions": [
+    {
+      "frontend": "lib/browser/example-frontend-module"
+    }
+  ]
+}

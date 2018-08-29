@@ -1,0 +1,32 @@
+{
+  "version": "0.0.1",
+  "name": "tree-editor-extension",
+  "description": "Theia Tree Editor",
+  "main": "lib/browser/index.js",
+  "typings": "lib/browser/index.d.ts",
+  "files": [
+    "lib",
+    "src"
+  ],
+  "dependencies": {
+    "@jsonforms/core": "^2.0.6",
+    "@jsonforms/material-tree-renderer": "^2.0.7",
+    "@theia/core": "latest",
+    "@theia/editor": "latest",
+    "@theia/filesystem": "latest",
+    "react": "^16.4.0",
+    "react-dom": "^16.4.0",
+    "react-redux": "^4.4.9",
+    "recompose": "^0.27.1",
+    "redux": "^3.7.2"
+  },
+  "devDependencies": {
+    "typescript": "latest"
+  },
+  "scripts": {
+    "prepare": "yarn run clean && yarn run build",
+    "clean": "rm -rf lib",
+    "build": "tsc",
+    "watch": "tsc -w"
+  }
+}
