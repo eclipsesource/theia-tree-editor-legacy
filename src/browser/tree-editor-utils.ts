@@ -22,38 +22,41 @@ export interface LabelDefinition {
 export const calculateLabel = (labels) =>
   (schema: JsonSchema7) => (element: Object): string => {
 
-    if (labels !== undefined && labels[schema.$id] !== undefined) {
+    if (element !== undefined) {
+      if (labels !== undefined && labels[schema.$id] !== undefined) {
 
-      if (typeof labels[schema.$id] === 'string') {
-        // To be backwards compatible: a simple string is assumed to be a property name
-        console.log('element', element);
-        return element[labels[schema.$id]];
+        if (typeof labels[schema.$id] === 'string') {
+          // To be backwards compatible: a simple string is assumed to be a property name
+          return element[labels[schema.$id]];
+        }
+        if (typeof labels[schema.$id] === 'object') {
+          const info = labels[schema.$id] as LabelDefinition;
+          let label;
+          if (info.constant !== undefined) {
+            label = info.constant;
+          }
+          if (info.property !== undefined && element[info.property] !== undefined) {
+            label = label === undefined ?
+              element[info.property] :
+              `${label} ${element[info.property]}`;
+          }
+          if (label !== undefined) {
+            return label;
+          }
+        }
       }
-      if (typeof labels[schema.$id] === 'object') {
-        const info = labels[schema.$id] as LabelDefinition;
-        let label;
-        if (info.constant !== undefined) {
-          label = info.constant;
-        }
-        if (info.property !== undefined && element[info.property] !== undefined) {
-          label = label === undefined ?
-            element[info.property] :
-            `${label} ${element[info.property]}`;
-        }
-        if (label !== undefined) {
-          return label;
-        }
+
+      const namingKeys = Object
+        .keys(schema.properties)
+        .filter(key => key === '$id' || key === 'name');
+      if (namingKeys.length !== 0) {
+        return element[namingKeys[0]];
       }
-    }
 
-    const namingKeys = Object
-      .keys(schema.properties)
-      .filter(key => key === '$id' || key === 'name');
-    if (namingKeys.length !== 0) {
-      return element[namingKeys[0]];
+      return JSON.stringify(element);
+    } else {
+      return schema.$id;
     }
-
-    return JSON.stringify(element);
   };
 
 export const filterPredicate = (modelMapping) => (data: any) => {
