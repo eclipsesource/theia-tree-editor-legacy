@@ -60,7 +60,12 @@ export const filterPredicate = (modelMapping) => (data: Object) => {
   return (property: Property): boolean => {
     if (modelMapping !== undefined && modelMapping.mapping !== undefined) {
       if (data[modelMapping.attribute]) {
-        return property.schema.$id === modelMapping.mapping[data[modelMapping.attribute]];
+        if (property.schema.hasOwnProperty('$id')) {
+          return property.schema['$id'] === modelMapping.mapping[data[modelMapping.attribute]];
+        }
+        if (property.schema.hasOwnProperty('id')) {
+          return property.schema['id'] === modelMapping.mapping[data[modelMapping.attribute]];
+        }
       }
       return true;
     }

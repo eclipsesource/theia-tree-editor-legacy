@@ -19,6 +19,6 @@
     "lerna": "2.4.0"
   },
   "workspaces": [
-    "tree-editor-extension", "example", "browser-app"
+    "tree-editor-extension", "browser-app"
   ]
 }

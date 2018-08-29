@@ -9,8 +9,8 @@
     "src"
   ],
   "dependencies": {
-    "@jsonforms/material-renderers": "^2.0.7",
-    "@jsonforms/material-tree-renderer": "^2.0.7",
+    "@jsonforms/material-renderers": "^2.0.8",
+    "@jsonforms/material-tree-renderer": "^2.0.10",
     "@theia/core": "latest",
     "react-redux": "^5.0.7",
     "recompose": "^0.28.2",
