@@ -12,7 +12,7 @@ import {
 import { UriCommandHandler, UriAwareCommandHandler } from '@theia/core/lib/common/uri-command-handler';
 import URI from '@theia/core/lib/common/uri';
 import { FileDownloadService } from '@theia/filesystem/lib/browser/download/file-download-service';
-import { OpenerOptions, WidgetManager, WidgetOpenHandler } from '@theia/core/lib/browser';
+import {OpenerOptions, WidgetManager, WidgetOpenerOptions, WidgetOpenHandler} from '@theia/core/lib/browser';
 import { EditorContextMenu } from '@theia/editor/lib/browser';
 import { TreeEditorWidget } from './theia-tree-editor-widget';
 
@@ -101,5 +101,9 @@ export class TheiaTreeEditorContribution extends WidgetOpenHandler<TreeEditorWid
       return;
     }
     await this.open(uri);
+  }
+
+  protected createWidgetOptions(uri: URI, options?: WidgetOpenerOptions): Object {
+    return {};
   }
 }
