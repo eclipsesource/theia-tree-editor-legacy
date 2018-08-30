@@ -61,7 +61,7 @@ export class TreeEditorWidget extends BaseWidget implements SaveableSource {
       .then(parsedContent => {
         Promise.resolve(this.store).then(initializedStore => {
           initializedStore.dispatch(Actions.update('', () => parsedContent));
-          const Editor = withProps({'saveable': this.saveable})(this.options.EditorComponent);
+          const Editor = withProps({'saveable': this.saveable, 'widget': this})(this.options.EditorComponent);
           ReactDOM.render(
             <Provider store={initializedStore}>
               <Editor/>
