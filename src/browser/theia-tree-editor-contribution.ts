@@ -12,7 +12,7 @@ import {
 import { UriCommandHandler, UriAwareCommandHandler } from '@theia/core/lib/common/uri-command-handler';
 import URI from '@theia/core/lib/common/uri';
 import { FileDownloadService } from '@theia/filesystem/lib/browser/download/file-download-service';
-import {OpenerOptions, WidgetManager, WidgetOpenerOptions, WidgetOpenHandler} from '@theia/core/lib/browser';
+import { OpenerOptions, WidgetManager, WidgetOpenHandler } from '@theia/core/lib/browser';
 import { EditorContextMenu } from '@theia/editor/lib/browser';
 import { TreeEditorWidget } from './theia-tree-editor-widget';
 
@@ -72,11 +72,11 @@ export class TheiaTreeEditorContribution extends WidgetOpenHandler<TreeEditorWid
 
   registerCommands(registry: CommandRegistry): void {
     registry.registerCommand(TreeEditorCommands.OPEN, new UriAwareCommandHandler<URI>(this.selectionService,
-    {
-      execute: uri => this.openForEditor(uri),
-      isEnabled: uri => uri.scheme === 'file' && uri.path.ext === '.json',
-      isVisible: uri => uri.scheme === 'file' && uri.path.ext === '.json',
-    }));
+      {
+        execute: uri => this.openForEditor(uri),
+        isEnabled: uri => uri.scheme === 'file' && uri.path.ext === '.json',
+        isVisible: uri => uri.scheme === 'file' && uri.path.ext === '.json',
+      }));
 
     registry.registerCommand(UISchemaDownloadCommand, this.newUriAwareCommandHandler({
       execute: uris => {
@@ -101,9 +101,5 @@ export class TheiaTreeEditorContribution extends WidgetOpenHandler<TreeEditorWid
       return;
     }
     await this.open(uri);
-  }
-
-  protected createWidgetOptions(uri: URI, options?: WidgetOpenerOptions): Object {
-    return {};
   }
 }

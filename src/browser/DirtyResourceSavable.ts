@@ -25,7 +25,6 @@ export class DirtyResourceSavable extends ResourceSaveable {
     const widget = _.head(this._widgetManager.getWidgets('theia-tree-editor')) as TreeEditorWidget;
     const dirtyClass = ` ${DIRTY_CLASS}`;
     widget.title.className = widget.title.className.replace(dirtyClass, '');
-
   }
 
   onSaveFailure = () => {
