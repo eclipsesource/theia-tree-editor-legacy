@@ -1,9 +1,10 @@
 import * as React from 'react';
 import * as _ from 'lodash';
-import {TreeEditorProps} from "./tree-editor-utils";
+import { connect } from 'react-redux';
+import {mapStateToTreeEditorProps, TreeEditorProps} from "./tree-editor-utils";
 import {DIRTY_CLASS} from "./theia-tree-editor-widget";
 
-export class TreeEditorApp extends React.Component<TreeEditorProps, {}> {
+class TreeEditorApp extends React.Component<TreeEditorProps, {}> {
 
   componentDidUpdate(prevProps) {
     const dirtyClass = ` ${DIRTY_CLASS}`;
@@ -18,3 +19,4 @@ export class TreeEditorApp extends React.Component<TreeEditorProps, {}> {
     }
   }
 }
+export default connect(mapStateToTreeEditorProps)(TreeEditorApp);
