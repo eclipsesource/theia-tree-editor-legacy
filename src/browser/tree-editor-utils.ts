@@ -9,7 +9,7 @@ export interface TreeEditorProps {
   filterPredicate: any;
   labelProvider: any;
   imageProvider: any;
-  widget: any;
+  saveable: any;
 }
 
 export interface LabelDefinition {
