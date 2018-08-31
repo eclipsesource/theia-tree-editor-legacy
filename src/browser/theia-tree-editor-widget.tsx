@@ -7,12 +7,13 @@ import { Provider } from 'react-redux';
 import { inject, injectable } from 'inversify';
 import { Actions } from '@jsonforms/core';
 import { withProps } from 'recompose';
+import {TreeEditorProps} from "./tree-editor-utils";
 
 export const TreeEditorWidgetOptions = Symbol('TreeEditorWidgetOptions');
 export interface TreeEditorWidgetOptions {
   resource: Resource;
   store: any;
-  EditorComponent: React.Component;
+  EditorComponent: React.Component<TreeEditorProps, any>;
   fileName: string;
   saveable: Saveable;
   onResourceLoad: any;
