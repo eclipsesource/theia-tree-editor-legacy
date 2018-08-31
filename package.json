@@ -11,9 +11,9 @@
   "dependencies": {
     "@jsonforms/core": "^2.0.8",
     "@jsonforms/material-tree-renderer": "^2.0.11",
-    "@theia/core": "0.3.13",
-    "@theia/editor": "0.3.13",
-    "@theia/filesystem": "0.3.13",
+    "@theia/core": "^0.3.14",
+    "@theia/editor": "^0.3.14",
+    "@theia/filesystem": "^0.3.14",
     "react": "^16.4.0",
     "react-dom": "^16.4.0",
     "react-redux": "^4.4.9",
@@ -21,7 +21,7 @@
     "redux": "^3.7.2"
   },
   "devDependencies": {
-    "typescript": "latest"
+    "typescript": "^3.0.3"
   },
   "scripts": {
     "prepare": "yarn run clean && yarn run build",

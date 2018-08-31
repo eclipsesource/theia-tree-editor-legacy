@@ -12,7 +12,7 @@ import {
 import { UriCommandHandler, UriAwareCommandHandler } from '@theia/core/lib/common/uri-command-handler';
 import URI from '@theia/core/lib/common/uri';
 import { FileDownloadService } from '@theia/filesystem/lib/browser/download/file-download-service';
-import { OpenerOptions, WidgetManager, WidgetOpenHandler } from '@theia/core/lib/browser';
+import { OpenerOptions, WidgetManager, WidgetOpenHandler, WidgetOpenerOptions } from '@theia/core/lib/browser';
 import { EditorContextMenu } from '@theia/editor/lib/browser';
 import { TreeEditorWidget } from './theia-tree-editor-widget';
 
@@ -36,6 +36,7 @@ export namespace NavigatorContextMenu {
 
 @injectable()
 export class TheiaTreeEditorContribution extends WidgetOpenHandler<TreeEditorWidget> implements CommandContribution, MenuContribution {
+
   readonly id = 'theia-tree-editor';
   readonly label = 'Open With Tree Editor';
 
@@ -102,4 +103,10 @@ export class TheiaTreeEditorContribution extends WidgetOpenHandler<TreeEditorWid
     }
     await this.open(uri);
   }
+  protected createWidgetOptions(uri: URI, options?: WidgetOpenerOptions): Object {
+    return {
+      name: "Generic Tree Editor"
+    };    
+  }
+
 }
