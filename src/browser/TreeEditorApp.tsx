@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import { connect } from 'react-redux';
 import {mapStateToTreeEditorProps, TreeEditorProps} from "./tree-editor-utils";
 import {DIRTY_CLASS} from "./theia-tree-editor-widget";
-import TreeWithDetailRenderer from '@jsonforms/material-tree-renderer/lib/tree/TreeWithDetailRenderer';
+import { TreeWithDetailRenderer } from '@jsonforms/material-tree-renderer';
 export class TreeEditorApp extends React.Component<TreeEditorProps, any> {
 
   componentDidUpdate(prevProps) {
