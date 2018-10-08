@@ -1,19 +1,10 @@
-import { injectable, inject } from "inversify";
-import {
-  Command,
-  CommandContribution,
-  CommandRegistry,
-  MenuContribution,
-  MenuModelRegistry,
-  MenuPath,
-  MessageService,
-  SelectionService
-} from "@theia/core/lib/common";
-import { UriCommandHandler, UriAwareCommandHandler } from '@theia/core/lib/common/uri-command-handler';
+import { NavigatableWidgetOpenHandler, OpenerOptions, WidgetManager } from '@theia/core/lib/browser';
+import { Command, CommandContribution, CommandRegistry, MenuContribution, MenuModelRegistry, MenuPath, MessageService, SelectionService } from "@theia/core/lib/common";
 import URI from '@theia/core/lib/common/uri';
-import { FileDownloadService } from '@theia/filesystem/lib/browser/download/file-download-service';
-import { OpenerOptions, WidgetManager, WidgetOpenHandler, WidgetOpenerOptions } from '@theia/core/lib/browser';
+import { UriAwareCommandHandler, UriCommandHandler } from '@theia/core/lib/common/uri-command-handler';
 import { EditorContextMenu } from '@theia/editor/lib/browser';
+import { FileDownloadService } from '@theia/filesystem/lib/browser/download/file-download-service';
+import { inject, injectable } from "inversify";
 import { TreeEditorWidget } from './theia-tree-editor-widget';
 
 export const UISchemaDownloadCommand = {
@@ -35,7 +26,7 @@ export namespace NavigatorContextMenu {
 }
 
 @injectable()
-export class TheiaTreeEditorContribution extends WidgetOpenHandler<TreeEditorWidget> implements CommandContribution, MenuContribution {
+export class TheiaTreeEditorContribution extends NavigatableWidgetOpenHandler<TreeEditorWidget> implements CommandContribution, MenuContribution {
   readonly id = 'theia-tree-editor';
   readonly label = 'Open With Tree Editor';
 
@@ -54,10 +45,6 @@ export class TheiaTreeEditorContribution extends WidgetOpenHandler<TreeEditorWid
     }
     return 0;
   }
-
-  protected createWidgetOptions(uri: URI, options?: WidgetOpenerOptions): WidgetOpenerOptions {
-    return {};
-}
 
   async open(uri: URI, options?: OpenerOptions): Promise<TreeEditorWidget> {
     return super.open(uri);

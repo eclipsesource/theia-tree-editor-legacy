@@ -1,4 +1,4 @@
-import { BaseWidget } from '@theia/core/lib/browser';
+import { BaseWidget, Navigatable } from '@theia/core/lib/browser';
 import { Message, Saveable, SaveableSource } from '@theia/core/lib/browser';
 import { Resource } from '@theia/core/lib/common';
 import * as React from 'react';
@@ -8,6 +8,7 @@ import { inject, injectable } from 'inversify';
 import { Actions } from '@jsonforms/core';
 import { withProps } from 'recompose';
 import {TreeEditorProps} from "./tree-editor-utils";
+import URI from '@theia/core/lib/common/uri';
 
 export const TreeEditorWidgetOptions = Symbol('TreeEditorWidgetOptions');
 export interface TreeEditorWidgetOptions {
@@ -33,7 +34,7 @@ let widgetCounter = 0;
 export const DIRTY_CLASS = 'theia-mod-dirty';
 const JSON_ICON_CLASS = 'database-icon medium-yellow file-icon';
 @injectable()
-export class TreeEditorWidget extends BaseWidget implements SaveableSource {
+export class TreeEditorWidget extends BaseWidget implements SaveableSource, Navigatable {
   saveable: Saveable;
   protected resource: Resource;
   protected store: any;
@@ -88,5 +89,12 @@ export class TreeEditorWidget extends BaseWidget implements SaveableSource {
 
   close() {
     super.close();
+  }
+
+  getResourceUri(): URI | undefined {
+    return this.options.resource.uri;
+  }
+  createMoveToUri(resourceUri: URI): URI | undefined {
+    return this.getResourceUri().withPath(resourceUri.path);
   }
 }
