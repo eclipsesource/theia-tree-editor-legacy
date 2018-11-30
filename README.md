@@ -38,18 +38,17 @@ First, let's scaffold a basic extension with the theia generator extension:
 
 
     mkdir veggie-editor && cd veggie-editor
-    yo theia-extension veggie-editor
+    yo theia-extension veggie-editor # add `"skipLibCheck": true` to the tsconfig.json of veggie-editor add run `yarn install` 
     cd veggie-editor-extension
 
 Let's add a couple of dependencies with yarn (**TODO**: we shouldn't need that many deps, e.g. `recompose`, `lodash` etc.):
 
-    yarn add https://github.com/eclipsesource/theia-tree-editor.git#v0.0.5
+    yarn add https://github.com/eclipsesource/theia-tree-editor.git#master
     yarn add @jsonforms/material-tree-renderer
     yarn add @jsonforms/material-renderers
     yarn add react-redux
     yarn add lodash
     yarn add recompose
-    yarn add lodash
 
 ## JSON Schema
 
@@ -417,7 +416,7 @@ export default new ContainerModule(bind => {
           const child = container.createChild();
           child.bind<TreeEditorWidgetOptions>(TreeEditorWidgetOptions)
             .toConstantValue({ resource, store, EditorComponent: App, fileName: new URI(uri.uri).path.base, 
-              saveable: new MyResourceSaveable(resource, () => getData(store.getState()), messageService, widgetManager), onResourceLoad: (x) => x});
+              saveable: new MyResourceSaveable(resource, () => getData(store.getState()), messageService, widgetManager), onResourceLoad: JSON.parse });
           return child.get(TreeEditorWidget);
         }
       }));
