@@ -58,7 +58,7 @@ yo theia-extension veggie-editor-extension
 ```
 
 Add `"skipLibCheck": true` to the `tsconfig.json` within the `veggie-editor-extension` folder, so it looks like:
-```json
+```
 {
   "compilerOptions": {
     // ...
@@ -154,12 +154,12 @@ as specifying a plain string.
 
 ```js
 export const labels = {
-	"#fruitsOrVeggies": {
-		constant: "Fruits/Vegetables"
-	},
-	"#veggie": {
-		property: "veggieName"
-	}
+  "#fruitsOrVeggies": {
+    constant: "Fruits/Vegetables"
+  },
+    "#veggie": {
+    property: "veggieName"
+  }
 }
 ```
 
@@ -180,11 +180,11 @@ respective `$id`s of the sub schemas.
 ```js
 // TODO: rename?
 export const modelMapping = {
-	attribute: 'type',
- 	mapping: {
-		fruitsOrVeggies: '#fruitsOrVeggies',
-		veggies: '#veggies'
- 	}	
+  attribute: 'type',
+  mapping: {
+    fruitsOrVeggies: '#fruitsOrVeggies',
+    veggies: '#veggies'
+  }	
 };
 ```
 
@@ -231,7 +231,7 @@ You can save and close `config.ts` now. We'll use it when we set up the Editor c
 We need to update the generated `tsconfig.json` in order to support writing React extensions.
 Add the following properties to `tsconfig.json`:
 
-```json
+```
 {
   "compilerOptions": {
     // ...
