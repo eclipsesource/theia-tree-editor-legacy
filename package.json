@@ -9,14 +9,16 @@
     "src"
   ],
   "dependencies": {
-    "@jsonforms/core": "^2.0.12-rc.1",
-    "@jsonforms/material-tree-renderer": "^2.0.12-rc.1",
-    "@theia/core": "^0.3.13",
-    "@theia/editor": "^0.3.13",
-    "@theia/filesystem": "^0.3.13",
+    "@jsonforms/core": "^2.2.2",
+    "@jsonforms/react": "^2.2.2",
+    "@jsonforms/material-renderers": "^2.2.2",
+    "@jsonforms/material-tree-renderer": "^2.2.2",
+    "@theia/core": "latest",
+    "@theia/editor": "latest",
+    "@theia/filesystem": "latest",
     "react": "^16.4.0",
     "react-dom": "^16.4.0",
-    "react-redux": "^4.4.9",
+    "react-redux": "^6.0.0",
     "recompose": "^0.27.1",
     "redux": "^3.7.2"
   },
