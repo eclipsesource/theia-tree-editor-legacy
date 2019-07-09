@@ -35,5 +35,10 @@
     "patch": "npm version patch",
     "tag": "PACKAGE_VERSION=$(echo $npm_package_version) && sed -i '/lib/d' .gitignore && git add .gitignore && git commit -m $PACKAGE_VERSION && git tag v$PACKAGE_VERSION && git push origin v$PACKAGE_VERSION",
     "version": "echo $npm_package_version"
+  },
+  "resolutions": {
+    "**/@theia/core": "0.7.1",
+    "**/@theia/editor": "0.7.1",
+    "**/@theia/filesystem": "0.7.1"
   }
 }

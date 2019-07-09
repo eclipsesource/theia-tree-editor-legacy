@@ -7,7 +7,7 @@ export interface TreeEditorProps {
   schema: any;
   rootData: any;
   filterPredicate: any;
-  labelProvider: any;
+  labelProviders: any;
   imageProvider: any;
   saveable: any;
   widget: any;
