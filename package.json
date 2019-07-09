@@ -9,14 +9,16 @@
     "src"
   ],
   "dependencies": {
-    "@jsonforms/core": "^2.0.12-rc.1",
-    "@jsonforms/material-tree-renderer": "^2.0.12-rc.1",
-    "@theia/core": "^0.3.13",
-    "@theia/editor": "^0.3.13",
-    "@theia/filesystem": "^0.3.13",
+    "@jsonforms/core": "2.3.0-alpha.1",
+    "@jsonforms/react": "2.3.0-alpha.1",
+    "@jsonforms/material-renderers": "2.3.0-alpha.1",
+    "@jsonforms/material-tree-renderer": "2.3.0-alpha.1",
+    "@theia/core": "0.7.1",
+    "@theia/editor": "0.7.1",
+    "@theia/filesystem": "0.7.1",
     "react": "^16.4.0",
     "react-dom": "^16.4.0",
-    "react-redux": "^4.4.9",
+    "react-redux": "^6.0.0",
     "recompose": "^0.27.1",
     "redux": "^3.7.2"
   },
@@ -33,5 +35,10 @@
     "patch": "npm version patch",
     "tag": "PACKAGE_VERSION=$(echo $npm_package_version) && sed -i '/lib/d' .gitignore && git add .gitignore && git commit -m $PACKAGE_VERSION && git tag v$PACKAGE_VERSION && git push origin v$PACKAGE_VERSION",
     "version": "echo $npm_package_version"
+  },
+  "resolutions": {
+    "**/@theia/core": "0.7.1",
+    "**/@theia/editor": "0.7.1",
+    "**/@theia/filesystem": "0.7.1"
   }
 }
